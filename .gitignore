@@ -114,3 +114,5 @@ dmypy.json
 .pyre/
 
 .virtualenv_django/
+
+node_modules/
