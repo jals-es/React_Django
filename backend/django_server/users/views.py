@@ -20,7 +20,7 @@ class RegistrationAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"message": "Usuario registrado correctamente"}, status=status.HTTP_201_CREATED)
 
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
@@ -30,7 +30,5 @@ class LoginAPIView(APIView):
         user = request.data.get('user', {})
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-
-        print(serializer)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

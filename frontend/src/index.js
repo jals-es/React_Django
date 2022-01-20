@@ -1,12 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { QueryClient, QueryClientProvider } from 'react-query'
+import axios from 'axios'
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+const defaultQueryFn = async ({ queryKey }) => {
+  const { data } = await axios.get(queryKey[0], { params: queryKey[1] })
+  return data
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryFn: defaultQueryFn,
+      staleTime: 300000,
+    },
+  },
+})
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

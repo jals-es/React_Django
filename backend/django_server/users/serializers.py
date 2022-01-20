@@ -1,3 +1,4 @@
+from enum import unique
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -8,6 +9,7 @@ import uuid
 class RegistrationSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(
+        required=True,
         max_length=128,
         min_length=8,
         write_only=True
@@ -15,6 +17,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    username = serializers.CharField( 
+        required=True,
+        max_length=15,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    first_name = serializers.CharField(
+        required=True,
+        max_length=50,
     )
 
     class Meta:
@@ -53,7 +64,7 @@ class LoginSerializer(serializers.Serializer):
             user = authenticate(email=username, password=password)
             if user is None:
                 raise serializers.ValidationError(
-                    'A user with this email and password was not found.'
+                    'A user with this username and password was not found.'
                 )
 
         if not user.is_active:
