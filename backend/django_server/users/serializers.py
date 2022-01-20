@@ -79,3 +79,25 @@ class LoginSerializer(serializers.Serializer):
             'photo': user.avatar,
             'token': user.token
         }
+
+class UserSerializer(serializers.ModelSerializer):
+
+    first_name = serializers.CharField()
+    username = serializers.CharField()
+    descr = serializers.CharField()
+    avatar = serializers.CharField()
+    
+    class Meta:
+        model = User
+        fields = (
+            'first_name', 'username', 'descr', 'avatar',
+        )
+
+    def getUser(self): 
+        return {
+            "name": self.data['first_name'],
+            "username": self.data['username'],
+            "descr": self.data['descr'],
+            "photo": self.data['avatar'] 
+        }
+        
