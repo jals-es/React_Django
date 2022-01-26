@@ -5,7 +5,7 @@ export const httpClient = axios.create({
 })
 
 if (localStorage.getItem("token")) {
-    httpClient.defaults.headers.common['Authorization'] = "Token " + localStorage.getItem("token");
+    httpClient.defaults.headers.common['Authorization'] = `Token ${localStorage.getItem("token")}`;
 }
 
 const ApiService = {

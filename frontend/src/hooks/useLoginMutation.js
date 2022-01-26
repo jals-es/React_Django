@@ -16,7 +16,6 @@ export default function useLogin() {
             }
         }), {
             onSuccess: async(response) => {
-                console.log(response.data);
                 await queryClient.cancelQueries(queryKey)
                 queryClient.setQueryData(queryKey, {
                     user: {
@@ -27,7 +26,7 @@ export default function useLogin() {
                     }
                 })
                 localStorage.setItem("token", response.data.token)
-                ApiHttpService.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+                ApiHttpService.defaults.headers.common['Authorization'] = `Token ${response.data.token}`;
             },
             onError: async(error) => {
                 if (!error.response.data) {
