@@ -1,10 +1,14 @@
+from dataclasses import field
 from email import message
+from pyexpat import model
 from paramiko import Agent
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from user_agents import parse
 
 from users.serializers import UserSerializer
-from .models import Post
+from .models import Post, Like
+from users.models import User
 
 class PostSerializer(serializers.ModelSerializer):
 
@@ -40,3 +44,20 @@ class PostSerializer(serializers.ModelSerializer):
             'agent': agent,
             'id_post_reply': id_post_reply 
         }
+
+class LikeSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    post = PostSerializer(read_only=True)
+    class Meta:
+        model = Like
+        fields = ['user', 'post']
+
+    def create(self, validate_data):
+        user = self.context.get('user', None)
+        post = self.context.get('post', None)
+
+        print(post.message)
+
+        like = Like.objects.create(id_post=post, id_user=user)
+        
+        return like

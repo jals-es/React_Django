@@ -20,7 +20,7 @@ class Post(TimestampedModel):
 
 class Like(TimestampedModel):
     id_post = models.ForeignKey(
-        'Post', on_delete=models.CASCADE, related_name='likes'
+        'posts.Post', on_delete=models.CASCADE, related_name='likes'
     )
     id_user = models.ForeignKey(
         'users.User', on_delete=models.CASCADE, related_name='likes'
@@ -31,7 +31,7 @@ class Like(TimestampedModel):
 
 class Repeat(TimestampedModel):
     id_post = models.ForeignKey(
-        'Post', on_delete=models.CASCADE, related_name='repeat'
+        'posts.Post', on_delete=models.CASCADE, related_name='repeat'
     )
     id_user = models.ForeignKey(
         'users.User', on_delete=models.CASCADE, related_name='repeat'
