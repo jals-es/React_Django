@@ -2,7 +2,7 @@ from enum import unique
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from .models import User
+from .models import Follow, User
 from django.contrib.auth.password_validation import validate_password
 import uuid
 
@@ -101,3 +101,21 @@ class UserSerializer(serializers.ModelSerializer):
             "photo": self.data['avatar'] 
         }
         
+class FollowSerializer(serializers.ModelSerializer):
+
+    user_followed = UserSerializer(read_only=True)
+    user_follow = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Follow
+        fields = ['user_followed', 'user_follow']
+
+    def create(self, validated_data):
+        user_followed=self.context.get("user_followed", None)
+        user_follow=self.context.get("user_follow", None)
+        
+        follow = Follow.objects.create(user_followed=user_followed, user_follow=user_follow)
+
+        print(follow)
+
+        return True

@@ -4,6 +4,7 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from django.contrib.auth.models import (AbstractUser, BaseUserManager)
 from django.db import models
+from core.models import TimestampedModel
 
 class UserManager(BaseUserManager):
 
@@ -73,3 +74,14 @@ class User(AbstractUser):
         }, settings.SECRET_KEY, algorithm='HS256')
         
         return token.decode('utf-8')
+
+class Follow(TimestampedModel):
+    user_followed = models.ForeignKey(
+        'users.User', on_delete=models.CASCADE, related_name='followed'
+    )
+    user_follow = models.ForeignKey(
+        'users.User', on_delete=models.CASCADE, related_name='follow'
+    )
+
+    class Meta:
+        unique_together = (("user_followed", "user_follow"),)
