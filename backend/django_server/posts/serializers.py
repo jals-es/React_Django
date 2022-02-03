@@ -1,4 +1,4 @@
-from dataclasses import field
+from django.db.models import F
 from email import message
 from pyexpat import model
 from paramiko import Agent
@@ -44,6 +44,26 @@ class PostSerializer(serializers.ModelSerializer):
             'agent': agent,
             'id_post_reply': id_post_reply 
         }
+
+class AllPostSerializer(serializers.ModelSerializer):
+    posts = PostSerializer()
+    
+    class Meta:
+        model = Post
+        fields = ['posts']
+
+    def get_all_posts(self):
+
+        user = self.context
+
+        try:
+            posts = list(Post.objects.filter(id_user=user)
+            .order_by('-created_at')
+            .values('id', 'message', 'agent', id_reply=F('id_post_reply_id'), user=F('id_user_id'), date=F('created_at')))
+        except Post.DoesNotExist:
+            posts = list(Post.objects.all().order_by('-created_at'))
+
+        return posts
 
 class LikeSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

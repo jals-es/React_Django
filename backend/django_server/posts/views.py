@@ -6,7 +6,7 @@ from rest_framework import status, generics
 from django.db.models import Q
 from .models import Like, Post
 from .serializers import (
-    PostSerializer, LikeSerializer
+    PostSerializer, LikeSerializer, AllPostSerializer
 )
 
 # Create your views here.
@@ -72,3 +72,12 @@ class CreateLikeAPIView(APIView):
 
         return Response({'message': 'Like borrado'})
     
+class PostAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AllPostSerializer
+
+    def get(self, request):
+
+        serializer = self.serializer_class(context=request.user)
+
+        return Response(serializer.get_all_posts())
