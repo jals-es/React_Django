@@ -5,6 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from "yup";
 import { ChatBubbleOutline, Repeat, FavoriteBorder, Share } from '@material-ui/icons';
 import './home.css'
+import useCreatePost from '../../hooks/useCreatePost';
 export default function Home() {
 
     useEffect(() => {
@@ -17,7 +18,7 @@ export default function Home() {
             .max(280, "* Message to long")
     });
 
-    const { register, handleSubmit, formState: { errors }, reset, setValue} = useForm({
+    const { register, handleSubmit, formState: { errors }, setValue, setError} = useForm({
         mode: "onSubmit",
         resolver: yupResolver(formSchema)
     });
@@ -39,9 +40,20 @@ export default function Home() {
             }, 1);
     }
 
-    function submitPost(data){
+    const createPostMutation = useCreatePost()
+
+    async function submitPost(data){
         console.log(data)
-        reset()
+        try {
+            await createPostMutation.mutateAsync(data)
+            document.getElementById("tweet").textContent = "";
+        } catch (error) {
+            if(error.response.data){
+                console.log(error.response.data)
+                document.getElementById("tweet").textContent = "";
+                setError("message", {message: "Error al crear el post"})
+            }
+        }
     }
     return (
         <div id="user-feed h-100">
@@ -81,19 +93,19 @@ export default function Home() {
                             <p>3:30 PM &middot; June 29, 2021 <span>Twitter for iPhone</span></p>
                         </div>
                         <div className="bottom-section">
-                            <span className='commentIcon rounded'>
+                            <span className='commentIcon'>
                                 <ChatBubbleOutline className='mr-2'/>
                                 1
                             </span>
-                            <span className='repeatIcon rounded'>
+                            <span className='repeatIcon'>
                                 <Repeat className='mr-2'/>
                                 123
                             </span>
-                            <span className='likeIcon rounded'>
+                            <span className='likeIcon'>
                                 <FavoriteBorder className='mr-2'/>
                                 333
                             </span>
-                            <span className='shareIcon rounded'>
+                            <span className='shareIcon'>
                                 <Share/>
                             </span>
                         </div>

@@ -233,13 +233,18 @@ label {
     color: rgba(52, 152, 219, 1);
 }
 
-
-/* .counter {
-    opacity: initial !important;
-    color: gray;
+.likeIcon.active {
+    color: rgba(231, 76, 60, 1);
 }
 
-.counter:hover {
-    opacity: initial !important;
-    color: gray;
-} */
+.likeIcon.active:hover {
+    opacity: 1;
+}
+
+.repeatIcon.active {
+    color: rgba(46, 204, 113, 1);
+}
+
+.repeatIcon.active:hover {
+    opacity: 1;
+}
