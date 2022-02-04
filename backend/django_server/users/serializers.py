@@ -1,10 +1,12 @@
-from enum import unique
+from asyncore import write
+from urllib import response
+from rest_framework.exceptions import NotFound
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from .models import Follow, User
 from django.contrib.auth.password_validation import validate_password
-import uuid
+from uuid import UUID
 
 class RegistrationSerializer(serializers.ModelSerializer):
 
@@ -82,6 +84,7 @@ class LoginSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
+    id = serializers.CharField(write_only=True)
     first_name = serializers.CharField()
     username = serializers.CharField()
     descr = serializers.CharField()
@@ -90,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'first_name', 'username', 'descr', 'avatar',
+            'id', 'first_name', 'username', 'descr', 'avatar',
         )
 
     def getUser(self): 
@@ -100,7 +103,49 @@ class UserSerializer(serializers.ModelSerializer):
             "descr": self.data['descr'],
             "photo": self.data['avatar'] 
         }
-        
+    
+    def to_representation(self, instance):
+
+        return {
+            'name': instance.first_name,
+            'username': instance.username,
+            'descr': instance.descr,
+            'photo': instance.avatar
+        }
+
+class AllUsersSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['user']
+
+    def getSuggestedUsers(self, data):
+
+        try:
+            users = User.objects.raw('''
+            SELECT *
+            FROM users_user 
+            WHERE id NOT IN ( 
+                SELECT user_followed_id 
+                FROM users_follow 
+                WHERE user_follow_id = '{arg}' 
+            ) AND id != '{arg}' AND is_superuser = 0 
+            ORDER BY RAND () 
+            LIMIT 5  
+            '''.format(arg=data.id.hex))
+        except User.DoesNotExist:
+            raise NotFound("No hay sugeridos")
+
+        res = []
+        for u in users:
+            res.append({
+                'name': u.first_name,
+                'username': u.username,
+                'photo': u.avatar
+            })
+
+        return res
 class FollowSerializer(serializers.ModelSerializer):
 
     user_followed = UserSerializer(read_only=True)
@@ -115,7 +160,5 @@ class FollowSerializer(serializers.ModelSerializer):
         user_follow=self.context.get("user_follow", None)
         
         follow = Follow.objects.create(user_followed=user_followed, user_follow=user_follow)
-
-        print(follow)
 
         return True

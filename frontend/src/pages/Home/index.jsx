@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import { ChatBubbleOutline, Repeat, FavoriteBorder, Share } from '@material-ui/icons';
 import './home.css'
 import useCreatePost from '../../hooks/useCreatePost';
+import useGetPostsQuery from '../../hooks/useGetPostsQuery';
 export default function Home() {
 
     useEffect(() => {
@@ -55,6 +56,9 @@ export default function Home() {
             }
         }
     }
+
+    const { data } = useGetPostsQuery()
+
     return (
         <div id="user-feed h-100">
             <div id='header' className="row row1">
@@ -77,6 +81,9 @@ export default function Home() {
                             </div>
                         </form>
                     </div>
+    
+                    {data.map(post=>{
+    
                     <div className='feedSection post'>
                         <div className="title">
                             <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/twitter_circle-512.png" alt="tweet"/>
@@ -110,6 +117,7 @@ export default function Home() {
                             </span>
                         </div>
                     </div>
+                    })}
                 </div>
                 <div className="col-lg-3 col-md-12 col-sm-12"></div>
             </div>

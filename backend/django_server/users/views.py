@@ -7,7 +7,7 @@ from rest_framework import status, generics
 from django.db.models import Q
 from .models import User, Follow
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer, FollowSerializer
+    LoginSerializer, RegistrationSerializer, UserSerializer, FollowSerializer, AllUsersSerializer
 )
 
 # Create your views here.
@@ -90,3 +90,14 @@ class UserFollowAPIView(APIView):
         follow.delete()
 
         return Response({"message": "Has dejado de seguir al usuario"})
+
+class UserSuggestAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AllUsersSerializer
+
+    def get(self, request):
+
+        serializer = self.serializer_class()
+        users = serializer.getSuggestedUsers(request.user)
+
+        return Response(users)
