@@ -10,8 +10,6 @@ export default function UserTarget({data}){
     const followMutation = useFollowMutation();
 
     async function follow (){
-        console.log(data.username)
-
         try {
             await followMutation.mutateAsync(data.username)
         } catch (error) {

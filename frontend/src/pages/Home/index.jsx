@@ -62,8 +62,6 @@ export default function Home() {
 
     const {data} = useGetSuggestedUsersQuery();
 
-    console.log(data)
-
     if(data?.data && data.data.length > 0){
         suggestedUsers = data.data.map((user)=>
             <UserTarget key={user.username} data={user}/>
