@@ -84,7 +84,6 @@ class LoginSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
-    id = serializers.CharField(write_only=True)
     first_name = serializers.CharField()
     username = serializers.CharField()
     descr = serializers.CharField()
@@ -93,7 +92,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'first_name', 'username', 'descr', 'avatar',
+            'first_name', 'username', 'descr', 'avatar',
         )
 
     def getUser(self): 
@@ -103,16 +102,6 @@ class UserSerializer(serializers.ModelSerializer):
             "descr": self.data['descr'],
             "photo": self.data['avatar'] 
         }
-    
-    def to_representation(self, instance):
-
-        return {
-            'name': instance.first_name,
-            'username': instance.username,
-            'descr': instance.descr,
-            'photo': instance.avatar
-        }
-
 class AllUsersSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 

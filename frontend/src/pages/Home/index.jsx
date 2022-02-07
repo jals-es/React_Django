@@ -6,7 +6,8 @@ import * as Yup from "yup";
 import { ChatBubbleOutline, Repeat, FavoriteBorder, Share } from '@material-ui/icons';
 import './home.css'
 import useCreatePost from '../../hooks/useCreatePost';
-import useGetPostsQuery from '../../hooks/useGetPostsQuery';
+import UserTarget from '../../components/UserTarget';
+import useGetSuggestedUsersQuery from '../../hooks/useGetSuggestedUsersQuery';
 export default function Home() {
 
     useEffect(() => {
@@ -57,8 +58,22 @@ export default function Home() {
         }
     }
 
-    const { data } = useGetPostsQuery()
+    var suggestedUsers = null;
 
+    const {data} = useGetSuggestedUsersQuery();
+
+    console.log(data)
+
+    if(data?.data && data.data.length > 0){
+        suggestedUsers = data.data.map((user)=>
+            <UserTarget key={user.username} data={user}/>
+        );
+    }else{
+        suggestedUsers = <p className='mx-3 fst-italic'>We can't find recomended users</p>
+    }
+
+    
+ 
     return (
         <div id="user-feed h-100">
             <div id='header' className="row row1">
@@ -82,7 +97,7 @@ export default function Home() {
                         </form>
                     </div>
     
-                    {data.map(post=>{
+                    {/* {data.map(post=>{ */}
     
                     <div className='feedSection post'>
                         <div className="title">
@@ -117,9 +132,16 @@ export default function Home() {
                             </span>
                         </div>
                     </div>
-                    })}
+                    {/* })} */}
                 </div>
-                <div className="col-lg-3 col-md-12 col-sm-12"></div>
+                <div className="col-lg-3 col-md-12 col-sm-12 rightSection">
+                    <div className="userSection">
+                        <div className='title px-3 pt-3'>
+                            <p>Recomended users</p>
+                        </div>
+                        {suggestedUsers}
+                    </div>
+                </div>
             </div>
         </div>
     )

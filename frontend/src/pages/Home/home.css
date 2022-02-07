@@ -248,3 +248,13 @@ label {
 .repeatIcon.active:hover {
     opacity: 1;
 }
+
+.userSection {
+    border-bottom: 2px solid #E5E8E8;
+}
+
+.userSection .title {
+    /* border-bottom: 1px solid #E5E8E8; */
+    font-size: 150%;
+    font-weight: bold;
+}
