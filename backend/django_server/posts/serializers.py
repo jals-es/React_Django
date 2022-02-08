@@ -92,7 +92,7 @@ class AllPostSerializer(serializers.ModelSerializer):
                     ON r.id_post_id = p.id
                     GROUP BY p.id
                 ) r, (
-                    SELECT r3.id_post_id, u.id as user_repeat, r3.created_at
+                    SELECT r3.id_post_id, u.username as user_repeat, r3.created_at
                     FROM posts_repeat r3, users_follow f3, users_user u
                     WHERE r3.id_user_id = f3.user_followed_id AND f3.user_follow_id = "{arg}" AND r3.id_user_id = u.id
                 ) u2, users_user u

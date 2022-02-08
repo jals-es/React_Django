@@ -3,11 +3,12 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from "yup";
-import { ChatBubbleOutline, Repeat, FavoriteBorder, Share } from '@material-ui/icons';
 import './home.css'
 import useCreatePost from '../../hooks/useCreatePost';
 import UserTarget from '../../components/UserTarget';
 import useGetSuggestedUsersQuery from '../../hooks/useGetSuggestedUsersQuery';
+import useGetPostsQuery from '../../hooks/useGetPostsQuery';
+import PostTarget from '../../components/PostTarget';
 export default function Home() {
 
     useEffect(() => {
@@ -70,6 +71,19 @@ export default function Home() {
         suggestedUsers = <p className='mx-3 fst-italic'>We can't find recomended users</p>
     }
 
+    const {data:posts} = useGetPostsQuery();
+
+    console.log(posts)
+    
+    var myposts = null;
+    if(posts?.data && posts.data.length > 0){
+        myposts = posts.data.map((post)=>
+            <PostTarget key={post.id} data={post}/>
+        );
+    }else{
+        myposts = <p className='mx-3 fst-italic'>We can't find posts</p>
+    }
+
     
  
     return (
@@ -94,43 +108,7 @@ export default function Home() {
                             </div>
                         </form>
                     </div>
-    
-                    {/* {data.map(post=>{ */}
-    
-                    <div className='feedSection post'>
-                        <div className="title">
-                            <img src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/twitter_circle-512.png" alt="tweet"/>
-                            <div className="info">
-                            <h4 className="name">Lalala</h4>
-                            <p className="twitter-handle">@lalala</p>
-                            </div>
-                        </div>
-                        <div className="tweet">
-                            <p>Please be nice to people in service jobs. They work long hours and are treated like garbage by people, like the person
-                            who tried using the "barista" title in a demeaning way.</p>
-                        </div>
-                        <div className="time-and-date">
-                            <p>3:30 PM &middot; June 29, 2021 <span>Twitter for iPhone</span></p>
-                        </div>
-                        <div className="bottom-section">
-                            <span className='commentIcon'>
-                                <ChatBubbleOutline className='mr-2'/>
-                                1
-                            </span>
-                            <span className='repeatIcon'>
-                                <Repeat className='mr-2'/>
-                                123
-                            </span>
-                            <span className='likeIcon'>
-                                <FavoriteBorder className='mr-2'/>
-                                333
-                            </span>
-                            <span className='shareIcon'>
-                                <Share/>
-                            </span>
-                        </div>
-                    </div>
-                    {/* })} */}
+                    {myposts}
                 </div>
                 <div className="col-lg-3 col-md-12 col-sm-12 rightSection">
                     <div className="userSection">

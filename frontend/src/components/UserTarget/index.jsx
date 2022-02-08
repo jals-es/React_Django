@@ -1,7 +1,7 @@
 import './userTarget.css'
 import useFollowMutation from '../../hooks/useFollowMutation'
 
-export default function UserTarget({data}){
+export default function UserTarget({data, pfollow = true}){
 
     if(data.photo.length === 0){
         data.photo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMx1itTXTXLB8p4ALTTL8mUPa9TFN_m9h5VQ&usqp=CAU"
@@ -19,6 +19,11 @@ export default function UserTarget({data}){
         }
     }
 
+    let print_follow = null;
+    if(pfollow){
+        print_follow = <button onClick={follow} className='followButton btn btn-primary my-auto'>Follow</button>
+    }
+
     return (
         <div className="userTarget py-3 px-3">
             <div className='userPhoto' style={{backgroundImage: `url(${data.photo})`}}></div>
@@ -26,7 +31,7 @@ export default function UserTarget({data}){
                 <label className='name'>{data.name}</label>
                 <label className='username'>@{data.username}</label>
             </div>
-            <button onClick={follow} className='followButton btn btn-primary my-auto'>Follow</button>
+            {print_follow}
         </div>
     )
 }
