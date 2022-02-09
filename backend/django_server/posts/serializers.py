@@ -98,15 +98,49 @@ class AllPostSerializer(serializers.ModelSerializer):
                 ) u2, users_user u
                 WHERE p.id = l.id AND p.id = r.id AND p.id = u2.id_post_id AND p.id_user_id = u.id
             ) p1 LEFT JOIN (
-                SELECT l.id_post_id as id_post, l.id as id_like, r.id as id_repeat
-                FROM posts_like l LEFT JOIN posts_repeat r
-                ON l.id_post_id = r.id_post_id
-                WHERE l.id_user_id = "{arg}"
-                UNION
-                SELECT r.id_post_id as id_post, l.id as id_like, r.id as id_repeat
-                FROM posts_like l RIGHT JOIN posts_repeat r
-                ON l.id_post_id = r.id_post_id
-                WHERE r.id_user_id = "{arg}"
+                SELECT l.id_post, l.id_like, r.id_repeat
+                FROM (
+                    SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                    FROM posts_like
+                    WHERE id_user_id = "{arg}"
+                ) l, (
+                    SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                    FROM posts_repeat
+                    WHERE id_user_id = "{arg}"
+                ) r
+                WHERE l.id_post = r.id_post
+                UNION ALL
+                SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                FROM posts_like
+                WHERE id_user_id = "{arg}" AND id_post_id NOT IN (
+                    SELECT l.id_post
+                    FROM (
+                        SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                        FROM posts_like
+                        WHERE id_user_id = "{arg}"
+                    ) l, (
+                        SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                        FROM posts_repeat
+                        WHERE id_user_id = "{arg}"
+                    ) r
+                    WHERE l.id_post = r.id_post
+                )
+                UNION ALL
+                SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                FROM posts_repeat
+                WHERE id_user_id = "{arg}" AND id_post_id NOT IN (
+                    SELECT l.id_post
+                    FROM (
+                        SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                        FROM posts_like
+                        WHERE id_user_id = "{arg}"
+                    ) l, (
+                        SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                        FROM posts_repeat
+                        WHERE id_user_id = "{arg}"
+                    ) r
+                    WHERE l.id_post = r.id_post
+                )
             ) l1
             ON p1.id = l1.id_post
             ORDER BY p1.created_at DESC
