@@ -46,7 +46,6 @@ export default function Home() {
     const createPostMutation = useCreatePost()
 
     async function submitPost(data){
-        console.log(data)
         try {
             await createPostMutation.mutateAsync(data)
             document.getElementById("tweet").textContent = "";
@@ -72,8 +71,6 @@ export default function Home() {
     }
 
     const {data:posts} = useGetPostsQuery();
-
-    console.log(posts)
     
     var myposts = null;
     if(posts?.data && posts.data.length > 0){

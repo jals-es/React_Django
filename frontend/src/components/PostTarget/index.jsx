@@ -1,27 +1,53 @@
 import { ChatBubbleOutline, Repeat, FavoriteBorder, Share } from '@material-ui/icons';
+import { useState } from 'react';
 import UserTarget from '../../components/UserTarget';
+import useCreateLikeMutation from '../../hooks/useCreateLikeMutation';
+import useDeleteLikeMutation from '../../hooks/useDeleteLikeMutation';
 import './post.css'
 export default function PostTarget({data}){
-
+    const [you_like, setYouLike] = useState(data.data.you_like)
+    const [you_repeat, setYouRepeat] = useState(data.data.you_repeat)
+    const [nlike, setNLike] = useState(data.data.nlikes)
     let fecha = new Date(data.date)
-
-    let classNameLike = null;
-    if(data.data.you_like === 1){
-        classNameLike = "likeIcon active"
-    }else if(data.data.you_like === 0){
-        classNameLike = "likeIcon"
-    }
-
-    let classNameRepeat = null;
-    if(data.data.you_repeat === 1){
-        classNameRepeat = "repeatIcon active"
-    }else if(data.data.you_repeat === 0){
-        classNameRepeat = "repeatIcon"
-    }
 
     let userRepeat = null;
     if(data.data.user_repeat){
         userRepeat = <p className='userRepeat mx-3'><Repeat className='mr-2'/> Repeated by @{data.data.user_repeat}</p>
+    }
+
+    const createLikeMutation = useCreateLikeMutation()
+    const deleteLikeMutation = useDeleteLikeMutation()
+
+    async function like(){
+        if(you_like === 1){
+            setYouLike(0)
+            setNLike(nlike - 1)
+            try {
+                await deleteLikeMutation.mutateAsync(data.id)
+            } catch (error) {
+                setYouLike(1)
+                setNLike(nlike + 1)
+            }     
+        }else if(you_like === 0){
+            setYouLike(1)
+            setNLike(nlike + 1)
+            try {
+                await createLikeMutation.mutateAsync(data.id)
+            } catch (error) {
+                setYouLike(0)
+                setNLike(nlike - 1)
+            }     
+        }   
+    }
+
+    async function repeat(){
+        if(you_repeat === 1){
+            setYouRepeat(0)
+            data.data.nrepeats -= 1 
+        }else if(you_repeat === 0){
+            setYouRepeat(1)
+            data.data.nrepeats += 1
+        }
     }
 
     return (
@@ -40,13 +66,13 @@ export default function PostTarget({data}){
                 <span className='commentIcon'>
                     <ChatBubbleOutline className='mr-2'/>
                 </span>
-                <span className={classNameRepeat}>
+                <span onClick={repeat} className={`repeatIcon ${you_repeat > 0 ? 'active' : ''}`}>
                     <Repeat className='mr-2'/>
                     {data.data.nrepeats}
                 </span>
-                <span className={classNameLike}>
+                <span onClick={like} className={`likeIcon ${you_like > 0 ? 'active' : ''}`}>
                     <FavoriteBorder className='mr-2'/>
-                    {data.data.nlikes}
+                    {nlike}
                 </span>
                 <span className='shareIcon'>
                     <Share/>

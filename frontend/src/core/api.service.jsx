@@ -23,9 +23,10 @@ const ApiService = {
     },
     patch(path, body) {
         return httpClient.patch(path, body)
-            .catch((error) => {throw error})    },
-    delete(path) {
-        return httpClient.delete(path)
+            .catch((error) => {throw error})
+    },
+    delete(path, body) {
+        return httpClient.delete(path, {data: body})
             .catch((error) => {throw error})
     }
 }
