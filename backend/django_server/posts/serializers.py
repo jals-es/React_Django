@@ -9,7 +9,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from user_agents import parse
 
 from users.serializers import UserSerializer
-from .models import Post, Like
+from .models import Post, Like, Repeat
 from users.models import User
 
 class PostSerializer(serializers.ModelSerializer):
@@ -184,8 +184,21 @@ class LikeSerializer(serializers.ModelSerializer):
         user = self.context.get('user', None)
         post = self.context.get('post', None)
 
-        print(post.message)
-
         like = Like.objects.create(id_post=post, id_user=user)
         
         return like
+
+class RepeatSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    post = PostSerializer(read_only=True)
+    class Meta:
+        model = Repeat
+        fields = ['user', 'post']
+
+    def create(self, validate_data):
+        user = self.context.get('user', None)
+        post = self.context.get('post', None)
+
+        repeat = Repeat.objects.create(id_post=post, id_user=user)
+        
+        return repeat
