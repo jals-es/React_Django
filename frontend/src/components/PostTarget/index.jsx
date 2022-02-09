@@ -2,12 +2,15 @@ import { ChatBubbleOutline, Repeat, FavoriteBorder, Share } from '@material-ui/i
 import { useState } from 'react';
 import UserTarget from '../../components/UserTarget';
 import useCreateLikeMutation from '../../hooks/useCreateLikeMutation';
+import useCreateRepeatMutation from '../../hooks/useCreateRepeatMutation';
 import useDeleteLikeMutation from '../../hooks/useDeleteLikeMutation';
+import useDeleteRepeatMutation from '../../hooks/useDeleteRepeatMutation';
 import './post.css'
 export default function PostTarget({data}){
     const [you_like, setYouLike] = useState(data.data.you_like)
     const [you_repeat, setYouRepeat] = useState(data.data.you_repeat)
     const [nlike, setNLike] = useState(data.data.nlikes)
+    const [nrepeat, setNRepeat] = useState(data.data.nrepeats)
     let fecha = new Date(data.date)
 
     let userRepeat = null;
@@ -17,6 +20,8 @@ export default function PostTarget({data}){
 
     const createLikeMutation = useCreateLikeMutation()
     const deleteLikeMutation = useDeleteLikeMutation()
+    const createRepeatMutation = useCreateRepeatMutation()
+    const deleteRepeatMutation = useDeleteRepeatMutation()
 
     async function like(){
         if(you_like === 1){
@@ -43,10 +48,22 @@ export default function PostTarget({data}){
     async function repeat(){
         if(you_repeat === 1){
             setYouRepeat(0)
-            data.data.nrepeats -= 1 
+            setNRepeat(nrepeat - 1)
+            try {
+                await deleteRepeatMutation.mutateAsync(data.id)
+            } catch (error) {
+                setYouRepeat(1)
+                setNRepeat(nrepeat + 1)
+            }
         }else if(you_repeat === 0){
             setYouRepeat(1)
-            data.data.nrepeats += 1
+            setNRepeat(nrepeat + 1)
+            try {
+                await createRepeatMutation.mutateAsync(data.id)
+            } catch (error) {
+                setYouRepeat(0)
+                setNRepeat(nrepeat - 1)
+            }
         }
     }
 
@@ -68,7 +85,7 @@ export default function PostTarget({data}){
                 </span>
                 <span onClick={repeat} className={`repeatIcon ${you_repeat > 0 ? 'active' : ''}`}>
                     <Repeat className='mr-2'/>
-                    {data.data.nrepeats}
+                    {nrepeat}
                 </span>
                 <span onClick={like} className={`likeIcon ${you_like > 0 ? 'active' : ''}`}>
                     <FavoriteBorder className='mr-2'/>
