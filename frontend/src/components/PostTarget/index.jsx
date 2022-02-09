@@ -5,13 +5,16 @@ import useCreateLikeMutation from '../../hooks/useCreateLikeMutation';
 import useCreateRepeatMutation from '../../hooks/useCreateRepeatMutation';
 import useDeleteLikeMutation from '../../hooks/useDeleteLikeMutation';
 import useDeleteRepeatMutation from '../../hooks/useDeleteRepeatMutation';
+import alertify from 'alertifyjs'
 import './post.css'
 export default function PostTarget({data}){
+    alertify.set('notifier', 'position', 'bottom-center');
     const [you_like, setYouLike] = useState(data.data.you_like)
     const [you_repeat, setYouRepeat] = useState(data.data.you_repeat)
     const [nlike, setNLike] = useState(data.data.nlikes)
     const [nrepeat, setNRepeat] = useState(data.data.nrepeats)
     let fecha = new Date(data.date)
+    data.id = data.id.replace(/-/g, '')
 
     let userRepeat = null;
     if(data.data.user_repeat){
@@ -67,6 +70,16 @@ export default function PostTarget({data}){
         }
     }
 
+    function copiarAlPortapapeles() {
+        var aux = document.createElement("input");
+        aux.setAttribute("value", `http://localhost:8080/post/${data.id}`);
+        document.body.appendChild(aux);
+        aux.select();
+        document.execCommand("copy");
+        document.body.removeChild(aux);
+        alertify.notify("URL copied to clipboard", 'custom')
+      }
+
     return (
         <div id={data.id} className='feedSection post'>
             {userRepeat}
@@ -91,7 +104,7 @@ export default function PostTarget({data}){
                     <FavoriteBorder className='mr-2'/>
                     {nlike}
                 </span>
-                <span className='shareIcon'>
+                <span onClick={copiarAlPortapapeles} className='shareIcon'>
                     <Share/>
                 </span>
             </div>
