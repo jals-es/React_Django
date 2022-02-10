@@ -18,7 +18,7 @@ class PostSerializer(serializers.ModelSerializer):
     message = serializers.CharField(max_length=280)
     id_user = UserSerializer(read_only=True)
     agent = serializers.CharField(read_only=True)
-    id_post_reply = serializers.UUIDField(required=False)
+    id_post_reply = Post()
 
     class Meta:
         model = Post
@@ -28,9 +28,17 @@ class PostSerializer(serializers.ModelSerializer):
         message = validated_data.get('message', None)
         id_user = validated_data.get('id_user', None)
         agent = parse(validated_data.get('agent', None))
-        id_post_reply = validated_data.get('id_post_reply', None)
+        id_post_reply = self.initial_data.get('id_post_reply', None)
 
-        post = Post.objects.create(id_user=id_user, message=message, agent=agent.os.family, id_post_reply=id_post_reply)
+        post_reply = None
+
+        if id_post_reply != None:
+            try:
+                post_reply = Post.objects.get(pk=id_post_reply)
+            except Post.DoesNotExist:
+                raise NotFound("No se encuentra el post padre")
+
+        post = Post.objects.create(id_user=id_user, message=message, agent=agent.os.family, id_post_reply=post_reply)
 
         return post
 
@@ -77,7 +85,7 @@ class AllPostSerializer(serializers.ModelSerializer):
                 WHERE p.id = l.id AND p.id = r.id AND p.id IN (
                     SELECT p2.id
                     FROM posts_post p2, users_follow f2
-                    WHERE p2.id_user_id = f2.user_followed_id AND f2.user_follow_id = "{arg}"
+                    WHERE p2.id_user_id = f2.user_followed_id AND f2.user_follow_id = "{arg}" OR p2.id_user_id = "{arg}"
                 ) AND p.id_user_id = u.id
                 UNION ALL
                 SELECT p.id, p.message, p.agent, p.id_post_reply_id, u.first_name, u.username, u.avatar, u2.created_at, l.likes, r.repeats, u2.user_repeat as user_repeat
