@@ -1,11 +1,13 @@
-import { ChatBubbleOutline, Repeat, FavoriteBorder, Share } from '@material-ui/icons';
+import { ChatBubbleOutline, Repeat, FavoriteBorder, Share, Reply } from '@material-ui/icons';
 import { useState } from 'react';
 import UserTarget from '../../components/UserTarget';
 import useCreateLikeMutation from '../../hooks/useCreateLikeMutation';
 import useCreateRepeatMutation from '../../hooks/useCreateRepeatMutation';
 import useDeleteLikeMutation from '../../hooks/useDeleteLikeMutation';
 import useDeleteRepeatMutation from '../../hooks/useDeleteRepeatMutation';
-import alertify from 'alertifyjs'
+import { Link } from 'react-router-dom'
+import alertify from 'alertifyjs';
+import ReplyPost from '../ReplyPost'
 import './post.css'
 export default function PostTarget({data}){
     alertify.set('notifier', 'position', 'bottom-center');
@@ -19,6 +21,11 @@ export default function PostTarget({data}){
     let userRepeat = null;
     if(data.data.user_repeat){
         userRepeat = <p className='userRepeat mx-3'><Repeat className='mr-2'/> Repeated by @{data.data.user_repeat}</p>
+    }
+
+    let postfather = null;
+    if(data.id_post_reply){
+        postfather = <Link className='mx-3' to={`/post/${data.id_post_reply.replace(/-/g, '')}`}><Reply/>See father post</Link>
     }
 
     const createLikeMutation = useCreateLikeMutation()
@@ -82,6 +89,7 @@ export default function PostTarget({data}){
 
     return (
         <div id={data.id} className='feedSection post'>
+            {postfather}
             {userRepeat}
             <div className="title">
                 <UserTarget data={data.user} pfollow={false}/>
@@ -93,8 +101,9 @@ export default function PostTarget({data}){
                 <p>{fecha.toLocaleString()} <span>MeToChat for {data.agent}</span></p>
             </div>
             <div className="bottom-section">
-                <span className='commentIcon'>
+                <span className='commentIcon' data-bs-toggle="modal" data-bs-target={`#reply${data.id}`} >
                     <ChatBubbleOutline className='mr-2'/>
+                    <ReplyPost id_post_reply={data.id}/>
                 </span>
                 <span onClick={repeat} className={`repeatIcon ${you_repeat > 0 ? 'active' : ''}`}>
                     <Repeat className='mr-2'/>

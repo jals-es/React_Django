@@ -1,0 +1,99 @@
+/* Tweet form */
+
+form {
+    margin: auto;
+    margin-bottom: 1px solid green;
+    position: relative;
+    top: 2%;
+    width: calc(100% - 3em);
+    max-width: 30em;
+}
+
+button,
+button span {
+    border-radius: 1.5em;
+}
+
+button {
+    background-color: #55abee;
+    border: 0;
+    color: #fff;
+    display: inline-block;
+    font-weight: bold;
+}
+
+button span {
+    display: block;
+    padding: 0.75em 1.5em;
+    transition: all 0.1s linear;
+}
+
+button:hover span {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+button:active span {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+button span:focus {
+    outline: 0;
+}
+
+button:disabled {
+    opacity: 0.5;
+}
+
+button:disabled:hover span,
+button:disabled:active span {
+    background-color: transparent;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.75em;
+}
+
+.textarea {
+    border: 0;
+    border-radius: 0.5em;
+    box-shadow: 0 0 0 0.1em #a8ceee inset;
+    margin: 0 auto 0.75em auto;
+    padding: 0.75em;
+    resize: none;
+    width: 100%;
+    min-height: 6em;
+}
+
+[placeholder]:empty::before {
+    content: attr(placeholder);
+    color: grey;
+    font-style: italic;
+}
+
+[placeholder]:empty:focus::before {
+    content: "";
+}
+
+.textarea:focus {
+    box-shadow: 0 0 0 0.1em #55abee inset;
+    outline: 0;
+}
+
+.textarea::placeholder {
+    color: #aaa;
+}
+
+.bottom {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.bottom>span {
+    margin-right: 0.75em;
+}
+
+.warn {
+    color: #c00;
+}
