@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from "yup";
 import useLogin from '../../hooks/useLoginMutation'
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import './Auth.css'
 export default function Login() {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const formSchema = Yup.object().shape({
         username: Yup.string()
@@ -28,8 +28,8 @@ export default function Login() {
     var loginOnSubmit = async(data) => {
         try {
             await loginMutation.mutateAsync(data)
-            reset()
-            navigate("/");
+            // navigate("/", { replace: true });
+            window.location.reload();
         } catch (error) {
             if(error.response.data){
                 console.log(error.response.data)

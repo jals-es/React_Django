@@ -7,6 +7,7 @@ import './App.css';
 import AuthRoute from "./components/AuthRoute"
 import Spinner from './components/spinner';
 import { Suspense } from 'react'
+import NoAuthRoute from './components/NoAuthRoute';
 export default function App() {
   const Home = React.lazy(() => import("./pages/Home"));
   const Login = React.lazy(() => import("./pages/Auth/login"));
@@ -16,8 +17,8 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Suspense fallback={<Spinner/>}><AuthRoute><Home/></AuthRoute></Suspense>}/>
-        <Route path="/login/" element={<Suspense fallback={<Spinner/>}><Login/></Suspense>} />
-        <Route path="/register/" element={<Suspense fallback={<Spinner/>}><Register/></Suspense>} />
+        <Route path="/login/" element={<Suspense fallback={<Spinner/>}><NoAuthRoute><Login/></NoAuthRoute></Suspense>} />
+        <Route path="/register/" element={<Suspense fallback={<Spinner/>}><NoAuthRoute><Register/></NoAuthRoute></Suspense>} />
         <Route path="*" element={<Suspense fallback={<Spinner/>}><Err404/></Suspense>}/>
       </Routes>
     </Router>

@@ -1,6 +1,7 @@
 import './userTarget.css'
 import useFollowMutation from '../../hooks/useFollowMutation'
-
+import { httpClient as ApiHttpService } from '../../core/api.service';
+// import { useNavigate } from "react-router-dom";
 export default function UserTarget({data, pfollow = true}){
 
     if(data.photo.length === 0){
@@ -19,9 +20,17 @@ export default function UserTarget({data, pfollow = true}){
         }
     }
 
+    function logout (){
+        localStorage.removeItem('token')
+        ApiHttpService.defaults.headers.common['Authorization'] = null;
+        window.location.reload();
+    }
+
     let print_follow = null;
-    if(pfollow){
+    if(pfollow === true){
         print_follow = <button onClick={follow} className='followButton btn btn-primary my-auto'>Follow</button>
+    }else if(pfollow === "logout"){
+        print_follow = <button onClick={logout} className='followButton btn btn-outline-danger my-auto'>Logout</button>
     }
 
     return (

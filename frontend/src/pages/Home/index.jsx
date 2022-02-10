@@ -9,6 +9,7 @@ import UserTarget from '../../components/UserTarget';
 import useGetSuggestedUsersQuery from '../../hooks/useGetSuggestedUsersQuery';
 import useGetPostsQuery from '../../hooks/useGetPostsQuery';
 import PostTarget from '../../components/PostTarget';
+import { useQuery } from 'react-query'
 export default function Home() {
 
     useEffect(() => {
@@ -75,18 +76,28 @@ export default function Home() {
     var myposts = null;
     if(posts?.data && posts.data.length > 0){
         myposts = posts.data.map((post)=>
-            <PostTarget key={post.id} data={post}/>
+            <PostTarget key={post.id+post.data.user_repeat} data={post}/>
         );
     }else{
         myposts = <p className='mx-3 fst-italic'>We can't find posts</p>
     }
-
     
- 
+    let user = null;
+    const {data:userAuth} = useQuery("get_user_auth") 
+    if(userAuth){
+        user = <UserTarget data={{
+            name: userAuth.data.first_name,
+            username: userAuth.data.username,
+            photo: userAuth.data.avatar
+        }} pfollow={"logout"}/>
+    }
+
     return (
         <div id="user-feed h-100">
             <div id='header' className="row row1">
-                <div className="col-12"></div>
+                <div className="col-12">
+                    {user}
+                </div>
             </div>
             <div className="row row2">
                 <div className="col-lg-3 col-md-6 col-sm-12 ">
