@@ -1,6 +1,4 @@
 FROM node:14.18.3
 WORKDIR /frontend
-COPY ./* ./
+ADD . ./
 EXPOSE 8080
-RUN npm install
-CMD ["npm start"]

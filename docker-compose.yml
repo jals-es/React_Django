@@ -1,8 +1,9 @@
 version: "3"
 services:
-  mysql:
+  db:
     image: mysql
     container_name: projecte_mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - "${MYSQL_PORT}:3306"
     environment:
@@ -12,15 +13,9 @@ services:
       - MYSQL_DATABASE
     networks:
       - main
-  app:
-    build: ./frontend/
-    ports:
-      - ${CLIENT_PORT}:8080
-    container_name: frontend
-    networks:
-      - main
   server:
     build: ./backend/
+    command: sh -c "chmod +x waitforit.sh; ./waitforit.sh db:3306; python3 manage.py migrate; python manage.py runserver 0.0.0.0:8000"
     ports:
       - ${SERVER_PORT}:8000
     container_name: backend
@@ -34,7 +29,17 @@ services:
     networks:
       - main
     depends_on:
-      - mysql
+      - db
+  app:
+    build: ./frontend/
+    ports:
+      - ${CLIENT_PORT}:8080
+    container_name: frontend
+    command: bash -c "npm install && npm start"
+    networks:
+      - main
+    depends_on:
+      - server
 networks:
   main:
     driver: bridge

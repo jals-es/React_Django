@@ -82,15 +82,18 @@ WSGI_APPLICATION = 'django_server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        # 'ENGINE': 'django.db.backends.mysql',
+        'ENGINE':   'mysql.connector.django',
         'NAME': os.environ['MYSQL_DATABASE'],
         'USER': os.environ['MYSQL_USER'],
         'PASSWORD': os.environ['MYSQL_PASSWORD'],
         'HOST': os.environ['MYSQL_HOST'],
         'PORT': os.environ['MYSQL_PORT'],
+        'OPTIONS': {
+            'auth_plugin': 'mysql_native_password'
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

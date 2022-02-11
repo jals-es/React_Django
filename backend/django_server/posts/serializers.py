@@ -1,7 +1,4 @@
 from django.db.models import F
-from email import message
-from pyexpat import model
-from paramiko import Agent
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from user_agents import parse

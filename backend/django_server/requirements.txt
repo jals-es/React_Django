@@ -12,6 +12,7 @@ fasteners==0.14.1
 filelock==3.0.12
 future==0.18.2
 mysqlclient==2.1.0
+mysql-connector-python==8.0.26
 pipenv==11.9.0
 PyJWT==1.7.1
 python-dateutil==2.7.3
