@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const httpClient = axios.create({
-    baseURL: 'http://192.168.11.118:8000'
+    baseURL: 'http://localhost:8000'
 })
 
 if (localStorage.getItem("token")) {
