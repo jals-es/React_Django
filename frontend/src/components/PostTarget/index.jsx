@@ -7,7 +7,7 @@ import useDeleteLikeMutation from '../../hooks/useDeleteLikeMutation';
 import useDeleteRepeatMutation from '../../hooks/useDeleteRepeatMutation';
 import { Link } from 'react-router-dom'
 import alertify from 'alertifyjs';
-import ReplyPost from '../ReplyPost'
+import { useNavigate } from 'react-router-dom';
 import './post.css'
 export default function PostTarget({data}){
     alertify.set('notifier', 'position', 'bottom-center');
@@ -25,7 +25,7 @@ export default function PostTarget({data}){
 
     let postfather = null;
     if(data.id_post_reply){
-        postfather = <Link className='mx-3' to={`/post/${data.id_post_reply.replace(/-/g, '')}`}><Reply/>See father post</Link>
+        postfather = <Link className='mx-3' to={`/post/${data.id_post_reply.replace(/-/g, '')}/`}><Reply/>See father post</Link>
     }
 
     const createLikeMutation = useCreateLikeMutation()
@@ -79,16 +79,22 @@ export default function PostTarget({data}){
 
     function copiarAlPortapapeles() {
         var aux = document.createElement("input");
-        aux.setAttribute("value", `http://localhost:8080/post/${data.id}`);
+        aux.setAttribute("value", `http://localhost:8080/post/${data.id}/`);
         document.body.appendChild(aux);
         aux.select();
         document.execCommand("copy");
         document.body.removeChild(aux);
         alertify.notify("URL copied to clipboard", 'custom')
-      }
+    }
 
+    const navigate = useNavigate();
+
+    function goToPost(){
+        navigate(`post/${data.id}/`)
+    }
+    
     return (
-        <div id={data.id} className='feedSection post'>
+        <div id={data.id} className='feedSection post' onDoubleClick={goToPost}>
             {postfather}
             {userRepeat}
             <div className="title">
@@ -101,9 +107,8 @@ export default function PostTarget({data}){
                 <p>{fecha.toLocaleString()} <span>MeToChat for {data.agent}</span></p>
             </div>
             <div className="bottom-section">
-                <span className='commentIcon' data-bs-toggle="modal" data-bs-target={`#reply${data.id}`} >
+                <span className='commentIcon' onClick={goToPost}>
                     <ChatBubbleOutline className='mr-2'/>
-                    <ReplyPost id_post_reply={data.id}/>
                 </span>
                 <span onClick={repeat} className={`repeatIcon ${you_repeat > 0 ? 'active' : ''}`}>
                     <Repeat className='mr-2'/>

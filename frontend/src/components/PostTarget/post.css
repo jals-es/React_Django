@@ -15,7 +15,6 @@
 /** twitt **/
 
 .post {
-    user-select: none;
     cursor: pointer;
 }
 
@@ -56,6 +55,7 @@
 }
 
 .time-and-date {
+    user-select: none;
     color: gray;
 }
 
