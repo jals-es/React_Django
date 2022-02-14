@@ -83,6 +83,18 @@ class PostAPIView(APIView):
 
         return Response(serializer.get_all_posts())
 
+    def post(self, request):
+
+        serialize_context = {
+            'user': request.user,
+            'id_post': request.data.get('id_post', None)
+        }
+
+        serializer = self.serializer_class(context=serialize_context)
+
+        return Response(serializer.get_post())
+
+
 
 class CreateRepeatAPIView(APIView):
     permission_classes = (IsAuthenticated,)

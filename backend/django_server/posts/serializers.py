@@ -56,11 +56,188 @@ class PostSerializer(serializers.ModelSerializer):
         }
 
 class AllPostSerializer(serializers.ModelSerializer):
-    # posts = PostSerializer(read_only=True)
     
-    # class Meta:
-    #     model = Post
-    #     fields = ['posts']
+    def get_post(self):
+        id_post = self.context.get("id_post", None)
+        user = self.context.get("user", None)
+
+        try:
+            posts = Post.objects.raw('''
+            SELECT p1.id, p1.message, p1.agent, NULL as id_post_reply_id, p1.first_name, p1.username, p1.avatar as photo, p1.created_at, p1.likes as nlikes, p1.repeats as nrepeats, (l1.id_like IS NOT NULL) AS you_like, (l1.id_repeat IS NOT NULL) AS you_repeat
+            FROM (
+                SELECT p.id, p.message, p.agent, p.id_post_reply_id, u.first_name, u.username, u.avatar, p.created_at, l.likes, r.repeats
+                FROM posts_post p, (
+                    SELECT p.id as id, COUNT(l.id) as likes
+                    FROM posts_post p LEFT JOIN posts_like l
+                    ON l.id_post_id = p.id
+                    GROUP BY p.id
+                ) l, (
+                    SELECT p.id as id, COUNT(r.id) as repeats
+                    FROM posts_post p LEFT JOIN posts_repeat r
+                    ON r.id_post_id = p.id
+                    GROUP BY p.id
+                ) r, users_user u
+                WHERE p.id = l.id AND p.id = r.id AND p.id = "{idp}" AND p.id_user_id = u.id
+            ) p1 LEFT JOIN (
+                SELECT l.id_post, l.id_like, r.id_repeat
+                FROM (
+                    SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                    FROM posts_like
+                    WHERE id_user_id = "{idu}"
+                ) l, (
+                    SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                    FROM posts_repeat
+                    WHERE id_user_id = "{idu}"
+                ) r
+                WHERE l.id_post = r.id_post
+                UNION ALL
+                SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                FROM posts_like
+                WHERE id_user_id = "{idu}" AND id_post_id NOT IN (
+                    SELECT l.id_post
+                    FROM (
+                        SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                        FROM posts_like
+                        WHERE id_user_id = "{idu}"
+                    ) l, (
+                        SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                        FROM posts_repeat
+                        WHERE id_user_id = "{idu}"
+                    ) r
+                    WHERE l.id_post = r.id_post
+                )
+                UNION ALL
+                SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                FROM posts_repeat
+                WHERE id_user_id = "{idu}" AND id_post_id NOT IN (
+                    SELECT l.id_post
+                    FROM (
+                        SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                        FROM posts_like
+                        WHERE id_user_id = "{idu}"
+                    ) l, (
+                        SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                        FROM posts_repeat
+                        WHERE id_user_id = "{idu}"
+                    ) r
+                    WHERE l.id_post = r.id_post
+                )
+            ) l1
+            ON p1.id = l1.id_post
+            '''.format(idu=user.id.hex, idp=id_post))
+        except Post.DoesNotExist:
+            raise NotFound("No existe el post")
+
+        for p in posts:
+            res = {
+                'id': p.id,
+                'message': p.message,
+                'agent': p.agent,
+                'id_post_reply': p.id_post_reply_id,
+                'date': p.created_at,
+                'user': {
+                    'name': p.first_name,
+                    'username': p.username,
+                    'photo': p.photo
+                },
+                'data': {
+                    'nlikes': p.nlikes,
+                    'nrepeats': p.nrepeats,
+                    'you_like': p.you_like,
+                    'you_repeat': p.you_repeat
+                },
+                'replys': []
+            }
+
+        try:
+            replys = Post.objects.raw('''
+            SELECT p1.id, p1.message, p1.agent, p1.id_post_reply_id, p1.first_name, p1.username, p1.avatar as photo, p1.created_at, p1.likes as nlikes, p1.repeats as nrepeats, (l1.id_like IS NOT NULL) AS you_like, (l1.id_repeat IS NOT NULL) AS you_repeat
+            FROM (
+                SELECT p.id, p.message, p.agent, p.id_post_reply_id, u.first_name, u.username, u.avatar, p.created_at, l.likes, r.repeats
+                FROM posts_post p, (
+                    SELECT p.id as id, COUNT(l.id) as likes
+                    FROM posts_post p LEFT JOIN posts_like l
+                    ON l.id_post_id = p.id
+                    GROUP BY p.id
+                ) l, (
+                    SELECT p.id as id, COUNT(r.id) as repeats
+                    FROM posts_post p LEFT JOIN posts_repeat r
+                    ON r.id_post_id = p.id
+                    GROUP BY p.id
+                ) r, users_user u
+                WHERE p.id = l.id AND p.id = r.id AND p.id_post_reply_id = "{idp}" AND p.id_user_id = u.id
+            ) p1 LEFT JOIN (
+                SELECT l.id_post, l.id_like, r.id_repeat
+                FROM (
+                    SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                    FROM posts_like
+                    WHERE id_user_id = "{idu}"
+                ) l, (
+                    SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                    FROM posts_repeat
+                    WHERE id_user_id = "{idu}"
+                ) r
+                WHERE l.id_post = r.id_post
+                UNION ALL
+                SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                FROM posts_like
+                WHERE id_user_id = "{idu}" AND id_post_id NOT IN (
+                    SELECT l.id_post
+                    FROM (
+                        SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                        FROM posts_like
+                        WHERE id_user_id = "{idu}"
+                    ) l, (
+                        SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                        FROM posts_repeat
+                        WHERE id_user_id = "{idu}"
+                    ) r
+                    WHERE l.id_post = r.id_post
+                )
+                UNION ALL
+                SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                FROM posts_repeat
+                WHERE id_user_id = "{idu}" AND id_post_id NOT IN (
+                    SELECT l.id_post
+                    FROM (
+                        SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                        FROM posts_like
+                        WHERE id_user_id = "{idu}"
+                    ) l, (
+                        SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                        FROM posts_repeat
+                        WHERE id_user_id = "{idu}"
+                    ) r
+                    WHERE l.id_post = r.id_post
+                )
+            ) l1
+            ON p1.id = l1.id_post
+            '''.format(idu=user.id.hex, idp=id_post))
+        except Post.DoesNotExist:
+            replys = None
+
+        if replys:
+            for r in replys:
+                res.get("replys", []).append({
+                    'id': r.id,
+                    'message': r.message,
+                    'agent': r.agent,
+                    'id_post_reply': None,
+                    'date': r.created_at,
+                    'user': {
+                        'name': r.first_name,
+                        'username': r.username,
+                        'photo': r.photo
+                    },
+                    'data': {
+                        'nlikes': r.nlikes,
+                        'nrepeats': r.nrepeats,
+                        'you_like': r.you_like,
+                        'you_repeat': r.you_repeat
+                    }
+                })
+
+        return res
 
     def get_all_posts(self):
 
