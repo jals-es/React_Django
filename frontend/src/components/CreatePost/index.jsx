@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from "yup";
 import useCreatePost from '../../hooks/useCreatePost';
 import './createpost.css'
-export default function CreatePost(){
+export default function CreatePost({reply=null}){
 
     useEffect(() => {
         register('post')
@@ -42,8 +42,22 @@ export default function CreatePost(){
 
     async function submitPost(data){
         try {
-            await createPostMutation.mutateAsync(data)
+            let post = {
+                post: {
+                    message: data.post
+                }
+            }
+
+            if(reply){
+                post.post.id_post_reply = reply
+            }
+
+            let createPost = await createPostMutation.mutateAsync(post)
             document.getElementById("tweet").textContent = "";
+
+            if(reply){
+                console.log(createPost.data)
+            }
         } catch (error) {
             if(error.response.data){
                 console.log(error.response.data)

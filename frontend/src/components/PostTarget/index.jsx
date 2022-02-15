@@ -90,7 +90,7 @@ export default function PostTarget({data}){
     const navigate = useNavigate();
 
     function goToPost(){
-        navigate(`post/${data.id}/`)
+        navigate(`/post/${data.id}/`)
     }
     
     return (

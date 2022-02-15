@@ -212,6 +212,7 @@ class AllPostSerializer(serializers.ModelSerializer):
                 )
             ) l1
             ON p1.id = l1.id_post
+            ORDER BY p1.created_at DESC
             '''.format(idu=user.id.hex, idp=id_post))
         except Post.DoesNotExist:
             replys = None
