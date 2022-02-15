@@ -51,7 +51,7 @@ export default function Login() {
                     <p className="text-danger">{errors.username?.message}</p>
                     <input type="password" placeholder="Password" {...register("password")}/>
                     <p className="text-danger">{errors.password?.message}</p>
-                    <p className='my-3 text-white'>¿No tienes cuenta? <Link to="/register/">Registrate</Link></p>
+                    <p className='my-3 text-white'>¿No tienes cuenta? <Link to="/register/">Regístrate</Link></p>
                     <button type="submit" id="login-button">Login</button>
                 </form>
             </div>

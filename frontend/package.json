@@ -50,6 +50,7 @@
         ]
     },
     "devDependencies": {
-        "@babel/plugin-proposal-throw-expressions": "^7.16.7"
+        "@babel/plugin-proposal-throw-expressions": "^7.16.7",
+        "cypress": "^9.4.1"
     }
 }
