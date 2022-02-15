@@ -1,32 +1,45 @@
-import './home.css'
-import UserTarget from '../../components/UserTarget';
-import useGetPostsQuery from '../../hooks/useGetPostsQuery';
-import PostTarget from '../../components/PostTarget';
+import { useParams } from 'react-router-dom'
+import useGetPostQuery from '../../hooks/useGetPostQuery'
+import React from 'react'
 import { useQuery } from 'react-query'
-import CreatePost from '../../components/CreatePost';
+import UserTarget from '../../components/UserTarget';
 import SuggestedUsers from '../../components/SuggestedUsers';
-export default function Home() {
+import PostTarget from '../../components/PostTarget';
+import './post.css'
+export default function Post(){
+    const { id_post } = useParams()
 
+    const { data } = useGetPostQuery({id_post: id_post})
 
-    const {data:posts} = useGetPostsQuery();
-    
-    var myposts = null;
-    if(posts?.data && posts.data.length > 0){
-        myposts = posts.data.map((post)=>
-            <PostTarget key={post.id+post.data.user_repeat} data={post}/>
-        );
-    }else{
-        myposts = <p className='mx-3 fst-italic'>We can't find posts</p>
-    }
-    
-    let user = null;
+    console.log(data?.data);
+
     const {data:userAuth} = useQuery("get_user_auth") 
+
+    if(!data?.data) {
+        const Err404 = React.lazy(() => import("../Err404"));
+        return (
+            <Err404/>
+        )
+    }
+
+    let post = data.data
+
+    let user = null;
     if(userAuth){
         user = <UserTarget data={{
             name: userAuth.data.first_name,
             username: userAuth.data.username,
             photo: userAuth.data.avatar
         }} pfollow={"logout"}/>
+    }
+    
+    let replys = null;
+    if(post.replys.length > 0){
+        replys = post.replys.map((post)=>
+            <PostTarget key={post.id} data={post}/>
+        )
+    }else{
+        replys = <p>No hay respuestas</p>
     }
 
     return (
@@ -41,10 +54,10 @@ export default function Home() {
 
                 </div>
                 <div className="col-lg-6 col-md-6 col-sm-12">
-                    <div className='feedSection'>
-                        <CreatePost/>
+                    <div className='feedSection fpost'>
+                        
                     </div>
-                    {myposts}
+                    {replys}
                 </div>
                 <div className="col-lg-3 col-md-12 col-sm-12 rightSection">
                     <div className="userSection">
