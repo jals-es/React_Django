@@ -1,0 +1,25 @@
+#menu {
+    border-bottom: 2px solid #E5E8E8;
+}
+
+#menu div {
+    color: black;
+    font-weight: bold;
+    margin-left: 30%;
+    padding: 3%;
+    padding-left: 5%;
+    padding-right: 5%;
+    width: fit-content;
+    cursor: pointer;
+    border-radius: 25px;
+    font-size: x-large;
+    transition: 250ms;
+}
+
+#menu div.home:hover {
+    background-color: rgba(85, 171, 238, 0.2);
+}
+
+#menu div.profile:hover {
+    background-color: rgba(46, 204, 113, 0.2);
+}
