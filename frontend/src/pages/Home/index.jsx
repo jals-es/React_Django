@@ -2,9 +2,10 @@ import './home.css'
 import UserTarget from '../../components/UserTarget';
 import useGetPostsQuery from '../../hooks/useGetPostsQuery';
 import PostTarget from '../../components/PostTarget';
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import CreatePost from '../../components/CreatePost';
 import SuggestedUsers from '../../components/SuggestedUsers';
+import Menu from '../../components/Menu';
 export default function Home() {
 
 
@@ -29,6 +30,12 @@ export default function Home() {
         }} pfollow={"logout"}/>
     }
 
+    const queryClient = useQueryClient()
+    setInterval(async function () {
+        await queryClient.invalidateQueries('get_post')
+        await queryClient.invalidateQueries('get_all_posts')
+    }, 30000);
+
     return (
         <div id="user-feed h-100">
             <div id='header' className="row row1">
@@ -38,7 +45,7 @@ export default function Home() {
             </div>
             <div className="row row2">
                 <div className="col-lg-3 col-md-6 col-sm-12 ">
-
+                    <Menu/>
                 </div>
                 <div className="col-lg-6 col-md-6 col-sm-12">
                     <div className='feedSection'>

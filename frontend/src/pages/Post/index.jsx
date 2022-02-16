@@ -7,6 +7,7 @@ import SuggestedUsers from '../../components/SuggestedUsers';
 import PostTarget from '../../components/PostTarget';
 import './post.css'
 import CreatePost from '../../components/CreatePost';
+import Menu from '../../components/Menu';
 export default function Post(){
     const { id_post } = useParams()
     const queryClient = useQueryClient()
@@ -55,7 +56,7 @@ export default function Post(){
             </div>
             <div className="row row2">
                 <div className="col-lg-3 col-md-6 col-sm-12 ">
-
+                    <Menu/>
                 </div>
                 <div className="col-lg-6 col-md-6 col-sm-12">
                     <div className='fpost'>

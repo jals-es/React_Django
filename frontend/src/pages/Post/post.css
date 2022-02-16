@@ -42,4 +42,5 @@
 .replys .noReplys {
     font-style: italic;
     padding: 2%;
+    text-align: center;
 }

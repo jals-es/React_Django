@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom'
 import alertify from 'alertifyjs';
 import { useNavigate } from 'react-router-dom';
 import './post.css'
+import { useQueryClient } from 'react-query';
 export default function PostTarget({data}){
     alertify.set('notifier', 'position', 'bottom-center');
     const [you_like, setYouLike] = useState(data.data.you_like)
@@ -17,6 +18,8 @@ export default function PostTarget({data}){
     const [nrepeat, setNRepeat] = useState(data.data.nrepeats)
     let fecha = new Date(data.date)
     data.id = data.id.replace(/-/g, '')
+
+    const queryClient = useQueryClient()
 
     let userRepeat = null;
     if(data.data.user_repeat){
@@ -89,8 +92,13 @@ export default function PostTarget({data}){
 
     const navigate = useNavigate();
 
-    function goToPost(){
+    async function goToPost(){
+        await queryClient.invalidateQueries('get_post')
+        let locate = window.location.pathname
         navigate(`/post/${data.id}/`)
+        if(locate !== "/"){
+            window.location.reload()
+        }
     }
     
     return (

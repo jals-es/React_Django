@@ -67,9 +67,16 @@ export default function CreatePost({reply=null}){
         }
     }
 
+    let myplaceholder;
+    if(reply){
+        myplaceholder = "Type your reply" 
+    }else{
+        myplaceholder = "What's happening?"
+    }
+
     return (
         <form onSubmit={handleSubmit(submitPost)}>
-            <div className='textarea' id="tweet" onKeyDown={ctChars} contentEditable="true" placeholder="What’s happening?" onInput={(e) => {setValue('post', e.currentTarget.textContent, { shouldValidate: true });}}/>
+            <div className='textarea' id="tweet" onKeyDown={ctChars} contentEditable="true" placeholder={myplaceholder} onInput={(e) => {setValue('post', e.currentTarget.textContent, { shouldValidate: true });}}/>
             <div className="bottom">
                 <span className="text-danger">{errors.post?.message}</span>
                 <span id='tweetcounter' data-limit="280" >280</span>
