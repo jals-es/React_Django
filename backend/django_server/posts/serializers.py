@@ -8,10 +8,10 @@ from paramiko import Agent
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from user_agents import parse
-
+from django.db.models import Q
 from users.serializers import UserSerializer
 from .models import Post, Like, Repeat
-from users.models import User
+from users.models import Follow, User
 
 class PostSerializer(serializers.ModelSerializer):
 
@@ -172,11 +172,24 @@ class AllPostSerializer(serializers.ModelSerializer):
                 }
             })
 
+        if user.id != act_user.id:
+            try: 
+                follow = Follow.objects.get(Q(user_follow=act_user.id) & Q(user_followed=user.id))
+                if follow:
+                    user_follow = True
+                else:
+                    user_follow = False
+            except Follow.DoesNotExist:
+                user_follow = False
+        else:
+            user_follow = None
+
         this_response = {
             'name': user.first_name,
             'username': user.username,
             'photo': user.avatar,
             'descr': user.descr,
+            'user_follow': user_follow,
             'user_posts': res
         }
 

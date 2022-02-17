@@ -8,7 +8,13 @@ export default function Menu(){
 
     function redirect(e){
         let el = e.target
+        let locate = window.location.pathname
         navigate(el.getAttribute('redirect'))
+        if(el.getAttribute('redirect') === `/${userAuth.data.username}`){
+            if(locate !== "/"){
+                window.location.reload()
+            }
+        }
     }
 
     const {data:userAuth} = useQuery("get_user_auth") 

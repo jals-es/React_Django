@@ -1,7 +1,7 @@
 import './userTarget.css'
 import useFollowMutation from '../../hooks/useFollowMutation'
 import { httpClient as ApiHttpService } from '../../core/api.service';
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 export default function UserTarget({data, pfollow = true}){
 
     if(data.photo.length === 0){
@@ -33,9 +33,19 @@ export default function UserTarget({data, pfollow = true}){
         print_follow = <button onClick={logout} className='followButton btn btn-outline-danger my-auto'>Logout</button>
     }
 
+    const navigate = useNavigate()
+
+    function goToProfile(){
+        let locate = window.location.pathname
+        navigate(`/${data.username}/`)
+        if(locate !== "/"){
+            window.location.reload()
+        }
+    }
+
     return (
         <div className="userTarget py-3 px-3">
-            <div className='userPhoto' style={{backgroundImage: `url(${data.photo})`}}></div>
+            <div className='userPhoto' onClick={goToProfile} style={{backgroundImage: `url(${data.photo})`}}></div>
             <div className='userInfo mx-3'>
                 <label className='name'>{data.name}</label>
                 <label className='username'>@{data.username}</label>
