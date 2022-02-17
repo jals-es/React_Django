@@ -4,18 +4,18 @@ import alertify from 'alertifyjs'
 
 alertify.set('notifier', 'position', 'top-right');
 
-export default function useFollowMutation() {
+export default function useUnfollowMutation() {
     const queryClient = useQueryClient()
     const queryKey = "followUser"
     return useMutation(
-        async(payload) => await ApiService.post("/api/user/follow/", {
+        async(payload) => await ApiService.delete("/api/user/follow/", {
             username: payload
         }), {
             onSuccess: async(response) => {
                 await queryClient.cancelQueries(queryKey)
                 await queryClient.invalidateQueries('get_user_posts')
 
-                alertify.success(`Usuario seguido`)
+                alertify.error(`Has dejado de seguir al usuario`)
 
 
                 let users = await ApiService.get("/api/user/suggest/")

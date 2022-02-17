@@ -5,6 +5,8 @@ import UserTarget from '../../components/UserTarget';
 import SuggestedUsers from '../../components/SuggestedUsers';
 import PostTarget from '../../components/PostTarget';
 import useGetUserPostsQuery from '../../hooks/useGetUserPostsQuery';
+import useFollowMutation from '../../hooks/useFollowMutation';
+import useUnfollowMutation from '../../hooks/useUnfollowMutation';
 import './profile.css'
 import Menu from '../../components/Menu';
 export default function Profile(){
@@ -37,12 +39,23 @@ export default function Profile(){
         posts = <p className='noReplys'>The user don't have posts</p>
     }
 
+    const followMutation = useFollowMutation()
+    const unfollowMutation = useUnfollowMutation()
+
     async function follow(){
-        console.log("follow");
+        try {
+            await followMutation.mutateAsync(data.data.username)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async function unfollow(){
-        console.log("unfollow");
+        try {
+            await unfollowMutation.mutateAsync(data.data.username)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     if(data?.data?.photo.length === 0){
@@ -51,11 +64,11 @@ export default function Profile(){
 
     let followButton, userInfoClass = null;
     if(data?.data?.user_follow){
-        followButton = <button onClick={follow} className='followButton btn btn-outline-danger my-auto col-4'>Unfollow</button>;
+        followButton = <button onClick={unfollow} className='followButton btn btn-outline-danger my-auto col-4'>Unfollow</button>;
         userInfoClass = "col-4"
     }else{
         if(data?.data?.user_follow === false){
-            followButton = <button onClick={unfollow} className='followButton btn btn-primary my-auto col-4'>Follow</button>;
+            followButton = <button onClick={follow} className='followButton btn btn-primary my-auto col-4'>Follow</button>;
             userInfoClass = "col-4"
         }else{
             followButton = null;
