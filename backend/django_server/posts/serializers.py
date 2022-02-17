@@ -1,3 +1,4 @@
+from urllib import response
 import django
 from django.db.models import F
 from rest_framework.exceptions import NotFound
@@ -56,6 +57,130 @@ class PostSerializer(serializers.ModelSerializer):
         }
 
 class AllPostSerializer(serializers.ModelSerializer):
+
+    def get_user_posts(self):
+        user = self.context.get("user", None)
+        act_user = self.context.get("act_user", None)
+
+        try:
+            posts = Post.objects.raw('''
+            SELECT p1.id, p1.message, p1.agent, p1.id_post_reply_id, p1.first_name, p1.username, p1.avatar as photo, p1.descr, p1.created_at, p1.likes as nlikes, p1.repeats as nrepeats, (l1.id_like IS NOT NULL) AS you_like, (l1.id_repeat IS NOT NULL) AS you_repeat, p1.user_repeat
+            FROM (
+                SELECT p.id, p.message, p.agent, p.id_post_reply_id, u.first_name, u.username, u.avatar, u.descr, p.created_at, l.likes, r.repeats, NULL as user_repeat
+                FROM posts_post p, (
+                    SELECT p.id as id, COUNT(l.id) as likes
+                    FROM posts_post p LEFT JOIN posts_like l
+                    ON l.id_post_id = p.id
+                    GROUP BY p.id
+                ) l, (
+                    SELECT p.id as id, COUNT(r.id) as repeats
+                    FROM posts_post p LEFT JOIN posts_repeat r
+                    ON r.id_post_id = p.id
+                    GROUP BY p.id
+                ) r, users_user u
+                WHERE p.id = l.id AND p.id = r.id AND p.id_user_id = u.id AND p.id_user_id = "{usr}"
+                UNION ALL
+                SELECT p.id, p.message, p.agent, p.id_post_reply_id, u.first_name, u.username, u.avatar, u.descr, u2.created_at, l.likes, r.repeats, u2.user_repeat as user_repeat
+                FROM posts_post p, (
+                    SELECT p.id as id, COUNT(l.id) as likes
+                    FROM posts_post p LEFT JOIN posts_like l
+                    ON l.id_post_id = p.id
+                    GROUP BY p.id
+                ) l, (
+                    SELECT p.id as id, COUNT(r.id) as repeats
+                    FROM posts_post p LEFT JOIN posts_repeat r
+                    ON r.id_post_id = p.id
+                    GROUP BY p.id
+                ) r, (
+                    SELECT r3.id_post_id, u.username as user_repeat, r3.created_at
+                    FROM posts_repeat r3, users_user u
+                    WHERE r3.id_user_id = u.id AND r3.id_user_id = "{usr}"
+                ) u2, users_user u
+                WHERE p.id = l.id AND p.id = r.id AND p.id = u2.id_post_id AND p.id_user_id = u.id
+            ) p1 LEFT JOIN (
+                SELECT l.id_post, l.id_like, r.id_repeat
+                FROM (
+                    SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                    FROM posts_like
+                    WHERE id_user_id = "{arg}"
+                ) l, (
+                    SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                    FROM posts_repeat
+                    WHERE id_user_id = "{arg}"
+                ) r
+                WHERE l.id_post = r.id_post
+                UNION ALL
+                SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                FROM posts_like
+                WHERE id_user_id = "{arg}" AND id_post_id NOT IN (
+                    SELECT l.id_post
+                    FROM (
+                        SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                        FROM posts_like
+                        WHERE id_user_id = "{arg}"
+                    ) l, (
+                        SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                        FROM posts_repeat
+                        WHERE id_user_id = "{arg}"
+                    ) r
+                    WHERE l.id_post = r.id_post
+                )
+                UNION ALL
+                SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                FROM posts_repeat
+                WHERE id_user_id = "{arg}" AND id_post_id NOT IN (
+                    SELECT l.id_post
+                    FROM (
+                        SELECT id_post_id as id_post, id as id_like, null as id_repeat
+                        FROM posts_like
+                        WHERE id_user_id = "{arg}"
+                    ) l, (
+                        SELECT id_post_id as id_post, null as id_like, id as id_repeat
+                        FROM posts_repeat
+                        WHERE id_user_id = "{arg}"
+                    ) r
+                    WHERE l.id_post = r.id_post
+                )
+            ) l1
+            ON p1.id = l1.id_post
+            ORDER BY p1.created_at DESC
+            LIMIT 30
+            '''.format(arg=act_user.id.hex, usr=user.id.hex))
+        except Post.DoesNotExist:
+            raise NotFound("No existe el post")
+
+        res = []
+        for p in posts:
+            res.append({
+                'id': p.id,
+                'message': p.message,
+                'agent': p.agent,
+                'id_post_reply': p.id_post_reply_id,
+                'date': p.created_at,
+                'user': {
+                    'name': p.first_name,
+                    'username': p.username,
+                    'photo': p.photo,
+                    'descr': p.descr
+                },
+                'data': {
+                    'nlikes': p.nlikes,
+                    'nrepeats': p.nrepeats,
+                    'you_like': p.you_like,
+                    'you_repeat': p.you_repeat,
+                    'user_repeat': p.user_repeat
+                }
+            })
+
+        this_response = {
+            'name': user.first_name,
+            'username': user.username,
+            'photo': user.avatar,
+            'descr': user.descr,
+            'user_posts': res
+        }
+
+        return this_response
     
     def get_post(self):
         id_post = self.context.get("id_post", None)

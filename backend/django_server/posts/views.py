@@ -1,3 +1,4 @@
+from multiprocessing import context
 from html5lib import serialize
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
@@ -6,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework import status, generics
 from django.db.models import Q
 from .models import Like, Post, Repeat
+from users.models import User
 from .serializers import (
     PostSerializer, LikeSerializer, AllPostSerializer, RepeatSerializer
 )
@@ -93,6 +95,28 @@ class PostAPIView(APIView):
         serializer = self.serializer_class(context=serialize_context)
 
         return Response(serializer.get_post())
+
+class UserPostAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AllPostSerializer
+
+    def post(self, request):
+
+        username = request.data.get('user', None)
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound('El usuario no existe')
+
+        serialize_context = {
+            'user': user,
+            'act_user': request.user
+        }
+
+        serializer = self.serializer_class(context=serialize_context)
+
+        return Response(serializer.get_user_posts())
 
 
 
