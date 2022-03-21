@@ -17,7 +17,7 @@ const actions = {
         localStorage.removeItem('token')
         ApiHttpService.defaults.headers.common['Authorization'] = null;
     },
-    checkAuth: async() => {
+    checkAuth: async(queryClient) => {
         const authUser = getAuthUser()
 
         if (!authUser || isEmpty(authUser)) {
@@ -28,9 +28,8 @@ const actions = {
                 .catch((error) => {
                     actions.logout()
                 })
-
             if (data) {
-                return authUser
+                return data.data
             }
             return {}
         }
@@ -41,7 +40,12 @@ const state = proxyWithComputed({
     authUser: actions.checkAuth(),
 }, {
     isAuth: (snap) => {
-        return !isEmpty(snap.authUser)
+        let data = snap.authUser;
+
+        if (!isEmpty(data)) {
+            return data
+        }
+        return false
     },
 })
 

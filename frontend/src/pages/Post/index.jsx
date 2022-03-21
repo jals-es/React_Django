@@ -1,27 +1,35 @@
-import './home.css'
-import UserTarget from '../../components/UserTarget';
-import useGetPostsQuery from '../../hooks/useGetPostsQuery';
-import PostTarget from '../../components/PostTarget';
+import { useParams } from 'react-router-dom'
+import useGetPostQuery from '../../hooks/useGetPostQuery'
+import React from 'react'
 import { useQuery, useQueryClient } from 'react-query'
-import CreatePost from '../../components/CreatePost';
+import UserTarget from '../../components/UserTarget';
 import SuggestedUsers from '../../components/SuggestedUsers';
+import PostTarget from '../../components/PostTarget';
+import './post.css'
+import CreatePost from '../../components/CreatePost';
 import Menu from '../../components/Menu';
-export default function Home() {
+export default function Post(){
+    const { id_post } = useParams()
+    const queryClient = useQueryClient()
 
+    const { data } = useGetPostQuery({id_post: id_post})
 
-    const {data:posts} = useGetPostsQuery();
-    
-    var myposts = null;
-    if(posts?.data && posts.data.length > 0){
-        myposts = posts.data.map((post)=>
-            <PostTarget key={post.id+post.data.user_repeat} data={post}/>
-        );
-    }else{
-        myposts = <p className='mx-3 fst-italic'>We can't find posts</p>
+    if(id_post !== data?.data?.id.replace(/-/g, '')){
+        queryClient.invalidateQueries('get_post')
     }
-    
-    let user = null;
+
     const {data:userAuth} = useQuery("get_user_auth") 
+
+    if(!data?.data) {
+        const Err404 = React.lazy(() => import("../Err404"));
+        return (
+            <Err404/>
+        )
+    }
+
+    let post = data.data
+
+    let user = null;
     if(userAuth){
         user = <UserTarget data={{
             name: userAuth.data.first_name,
@@ -29,12 +37,15 @@ export default function Home() {
             photo: userAuth.data.avatar
         }} pfollow={"logout"}/>
     }
-
-    const queryClient = useQueryClient()
-    setInterval(async function () {
-        await queryClient.invalidateQueries('get_post')
-        await queryClient.invalidateQueries('get_all_posts')
-    }, 30000);
+    
+    let replys = null;
+    if(post.replys.length > 0){
+        replys = post.replys.map((post)=>
+            <PostTarget key={post.id} data={post}/>
+        )
+    }else{
+        replys = <p className='noReplys'>No one has replied</p>
+    }
 
     return (
         <div id="user-feed h-100">
@@ -48,10 +59,15 @@ export default function Home() {
                     <Menu/>
                 </div>
                 <div className="col-lg-6 col-md-6 col-sm-12">
-                    <div className='feedSection'>
-                        <CreatePost/>
+                    <div className='fpost'>
+                        <PostTarget key={post.id} data={post}/>
                     </div>
-                    {myposts}
+                    <div className='feedSection'>
+                        <CreatePost reply={id_post}/>
+                    </div>
+                    <div className='replys'>
+                        {replys}
+                    </div>
                 </div>
                 <div className="col-lg-3 col-md-12 col-sm-12 rightSection">
                     <div className="userSection">

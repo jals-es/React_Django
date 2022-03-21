@@ -1,9 +1,8 @@
-html,
-body {
-    height: 100%;
+#body {
+    height: 100vh;
 }
 
-body {
+#body {
     display: flex;
     align-items: center;
     justify-content: center;

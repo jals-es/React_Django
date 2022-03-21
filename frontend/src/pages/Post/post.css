@@ -31,3 +31,16 @@
     font-size: 150%;
     font-weight: bold;
 }
+
+.replys {
+    border: 2px solid #E5E8E8;
+    border-top: 0px;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.replys .noReplys {
+    font-style: italic;
+    padding: 2%;
+    text-align: center;
+}

@@ -26,9 +26,9 @@ SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ '0.0.0.0', '127.0.0.1', 'localhost' ]
-
-
+# ALLOWED_HOSTS = [ '0.0.0.0', '127.0.0.1', 'localhost', '192.168.11.118' ]
+ALLOWED_HOSTS = ['*']
+CORS_ALLOWED_ALL_ORIGINS = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -135,6 +135,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 CORS_ORIGIN_WHITELIST = (
     'http://0.0.0.0:8080',
     'http://localhost:8080',
+    'http://192.168.11.118:8080',
 )
 
 

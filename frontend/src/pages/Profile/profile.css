@@ -1,0 +1,87 @@
+.row1 {
+    height: 10vh;
+}
+
+.row2 {
+    height: 90vh;
+}
+
+
+/** Feed Section **/
+
+.feedSection {
+    border: 2px solid #E5E8E8;
+    border-top: 0px;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    padding-left: 1%;
+    padding-right: 2%;
+}
+
+#header {
+    border-bottom: 2px solid #E5E8E8;
+}
+
+.userSection {
+    border-bottom: 2px solid #E5E8E8;
+}
+
+.userSection .title {
+    /* border-bottom: 1px solid #E5E8E8; */
+    font-size: 150%;
+    font-weight: bold;
+}
+
+.replys {
+    border: 2px solid #E5E8E8;
+    border-top: 0px;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.noReplys {
+    font-style: italic;
+    padding: 2%;
+    text-align: center;
+}
+
+
+/** Profile Target **/
+
+.profileTarget {
+    width: 100%;
+    text-align: center;
+}
+
+.profileTarget .userPhoto {
+    width: 200px;
+    height: 200px;
+    min-width: 50px;
+    background-size: cover;
+    background-position: top center;
+    border: 1px solid;
+    border-radius: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* .profileTarget .userInfo {
+    flex-basis: 100%;
+} */
+
+.profileTarget .userInfo .name {
+    margin: 0px;
+    font-size: 120%;
+    font-weight: bold;
+}
+
+.profileTarget .userInfo .username {
+    margin: 0px;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.profileTarget .userInfo .followButton {
+    height: min-content;
+}

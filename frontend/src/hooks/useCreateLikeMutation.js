@@ -4,20 +4,20 @@ import alertify from 'alertifyjs'
 
 alertify.set('notifier', 'position', 'top-right');
 
-export default function useCreatePost() {
+export default function useCreateLikeMutation() {
     const queryClient = useQueryClient()
-    const queryKey = "createPost"
+    const queryKey = "createLike"
     return useMutation(
-        async(payload) => await ApiService.post("/api/post/", payload), {
+        async(payload) => await ApiService.post("/api/post/like/", {
+            id_post: payload
+        }), {
             onSuccess: async(response) => {
-                await queryClient.cancelQueries(queryKey);
-                await queryClient.invalidateQueries('get_post')
-                await queryClient.invalidateQueries('get_all_posts')
-                console.log(response.data)
+                await queryClient.cancelQueries(queryKey)
             },
             onError: async(error) => {
+                console.log(error.response.data);
                 if (!error.response.data) {
-                    alertify.error("Error al crear el post")
+                    alertify.error("Error al dar like al post")
                 }
             },
             onSettled: () => {

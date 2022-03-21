@@ -1,12 +1,15 @@
+from multiprocessing import context
+from html5lib import serialize
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, generics
 from django.db.models import Q
-from .models import Like, Post
+from .models import Like, Post, Repeat
+from users.models import User
 from .serializers import (
-    PostSerializer, LikeSerializer, AllPostSerializer
+    PostSerializer, LikeSerializer, AllPostSerializer, RepeatSerializer
 )
 
 # Create your views here.
@@ -81,3 +84,83 @@ class PostAPIView(APIView):
         serializer = self.serializer_class(context=request.user)
 
         return Response(serializer.get_all_posts())
+
+    def post(self, request):
+
+        serialize_context = {
+            'user': request.user,
+            'id_post': request.data.get('id_post', None)
+        }
+
+        serializer = self.serializer_class(context=serialize_context)
+
+        return Response(serializer.get_post())
+
+class UserPostAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AllPostSerializer
+
+    def post(self, request):
+
+        username = request.data.get('user', None)
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound('El usuario no existe')
+
+        serialize_context = {
+            'user': user,
+            'act_user': request.user
+        }
+
+        serializer = self.serializer_class(context=serialize_context)
+
+        return Response(serializer.get_user_posts())
+
+
+
+class CreateRepeatAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = RepeatSerializer
+
+    def post(self, request):
+        id_post = request.data.get('id_post', None)
+
+        try:
+            post = Post.objects.get(pk=id_post)
+        except Post.DoesNotExist:
+            raise NotFound('No se ha encontrado el post')
+
+
+        if Repeat.objects.filter(Q(id_user=request.user) & Q(id_post=post)).exists():
+            raise NotFound('El repeat ya existe')
+            
+
+        serializer_context = {
+            'user': request.user,
+            'post': post
+        }
+
+        serializer = self.serializer_class(data={}, context=serializer_context)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({'message': 'Repeat guardado'})
+
+    def delete(self, request):
+        id_post = request.data.get('id_post', None)
+
+        try:
+            post = Post.objects.get(pk=id_post)
+        except Post.DoesNotExist:
+            raise NotFound('No se ha encontrado el post')
+
+        try:
+            repeat = Repeat.objects.get(Q(id_user=request.user) & Q(id_post=post))
+        except Repeat.DoesNotExist:
+            raise NotFound('El repeat no existe')
+
+        repeat.delete()
+
+        return Response({'message': 'Repeat borrado'})
