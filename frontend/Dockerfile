@@ -1,0 +1,4 @@
+FROM node:14.18.3
+WORKDIR /frontend
+ADD . ./
+EXPOSE 8080
