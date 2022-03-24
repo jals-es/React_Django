@@ -10,9 +10,12 @@ export default function Home() {
 
 
     const {data:posts} = useGetPostsQuery();
+
+    console.log(posts);
     
     var myposts = null;
     if(posts?.data && posts.data.length > 0){
+        console.log(posts);
         myposts = posts.data.map((post)=>
             <PostTarget key={post.id+post.data.user_repeat} data={post}/>
         );

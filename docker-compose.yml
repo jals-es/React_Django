@@ -6,6 +6,8 @@ services:
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - "${MYSQL_PORT}:3306"
+    cap_add:
+      - SYS_NICE
     environment:
       - MYSQL_USER
       - MYSQL_PASSWORD
@@ -13,11 +15,14 @@ services:
       - MYSQL_DATABASE
     networks:
       - main
+    restart: always
   server:
-    build: ./backend/
-    command: sh -c "chmod +x waitforit.sh; ./waitforit.sh db:3306; python3 manage.py migrate; python manage.py runserver 0.0.0.0:8000"
+    image: python:3.8.10
+    command: sh -c "cd /backend/django_server; pip3 install -r requirements.txt; chmod +x waitforit.sh; ./waitforit.sh db:3306; python3 manage.py migrate; python manage.py runserver 0.0.0.0:8000"
     ports:
       - ${SERVER_PORT}:8000
+    volumes:
+      - ./backend/django_server:/backend/django_server
     container_name: backend
     environment:
       - MYSQL_USER
@@ -30,18 +35,21 @@ services:
       - main
     depends_on:
       - db
+    restart: always
   app:
-    build: ./frontend/
+    image: node:14.18.3
     ports:
       - ${CLIENT_PORT}:8080
+    volumes:
+      - ./frontend:/frontend
     container_name: frontend
-    command: bash -c "npm install && npm start"
+    command: bash -c "cd /frontend; npm install && npm start"
     networks:
       - main
     depends_on:
       - server
+    restart: always
 networks:
   main:
     driver: bridge
     external: true
-

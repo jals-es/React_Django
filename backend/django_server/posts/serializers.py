@@ -1,12 +1,5 @@
-from urllib import response
-import django
-from django.db.models import F
 from rest_framework.exceptions import NotFound
-from email import message
-from pyexpat import model
-from paramiko import Agent
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 from user_agents import parse
 from django.db.models import Q
 from users.serializers import UserSerializer
