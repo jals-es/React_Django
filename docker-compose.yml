@@ -32,11 +32,11 @@ services:
       - MYSQL_PORT
       - DJANGO_SECRET_KEY
     networks:
-      - main
+      - metochat
     depends_on:
       - db
     restart: always
 networks:
-  main:
+  metochat:
     driver: bridge
     external: true
