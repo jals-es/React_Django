@@ -18,7 +18,7 @@ services:
     restart: always
   server:
     image: python:3.8.10
-    command: sh -c "cd /backend/django_server; pip3 install -r requirements.txt; chmod +x waitforit.sh; ./waitforit.sh db:3306; python3 manage.py migrate; python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "cd /backend/django_server; pip3 install -r requirements.txt; chmod +x waitforit.sh; ./waitforit.sh ${MYSQL_HOST}:${MYSQL_PORT}; python3 manage.py migrate; python manage.py runserver 0.0.0.0:8000"
     ports:
       - ${SERVER_PORT}:8000
     volumes:
@@ -35,19 +35,6 @@ services:
       - main
     depends_on:
       - db
-    restart: always
-  app:
-    image: node:14.18.3
-    ports:
-      - ${CLIENT_PORT}:8080
-    volumes:
-      - ./frontend:/frontend
-    container_name: frontend
-    command: bash -c "cd /frontend; npm install && npm start"
-    networks:
-      - main
-    depends_on:
-      - server
     restart: always
 networks:
   main:
