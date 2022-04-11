@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const httpClient = axios.create({
-    baseURL: 'https://metochat.jals.es:8000'
+    baseURL: 'http://localhost:8000'
 })
 
 if (localStorage.getItem("token")) {
