@@ -2,7 +2,7 @@ version: "3"
 services:
   db:
     image: mysql
-    container_name: projecte_mysql
+    container_name: metochat_mysql
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - "${MYSQL_PORT}:3306"
@@ -18,12 +18,12 @@ services:
     restart: always
   server:
     image: python:3.8.10
-    command: sh -c "cd /backend/django_server; pip3 install -r requirements.txt; chmod +x waitforit.sh; ./waitforit.sh ${MYSQL_HOST}:${MYSQL_PORT}; python3 manage.py migrate; python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "cd /backend/django_server; pip3 install -r requirements.txt; chmod +x waitforit.sh; ./waitforit.sh ${MYSQL_HOST}:3306; python3 manage.py migrate; python manage.py runserver 0.0.0.0:8000"
     ports:
       - ${SERVER_PORT}:8000
     volumes:
       - ./backend/django_server:/backend/django_server
-    container_name: backend
+    container_name: metochat_backend
     environment:
       - MYSQL_USER
       - MYSQL_PASSWORD

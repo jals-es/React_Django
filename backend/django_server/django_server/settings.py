@@ -88,7 +88,7 @@ DATABASES = {
         'USER': os.environ['MYSQL_USER'],
         'PASSWORD': os.environ['MYSQL_PASSWORD'],
         'HOST': os.environ['MYSQL_HOST'],
-        'PORT': os.environ['MYSQL_PORT'],
+        'PORT': 3306,
         'OPTIONS': {
             'auth_plugin': 'mysql_native_password'
         }
