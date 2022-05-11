@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+SECRET_KEY = 'django-insecure-q&c2pafc%@w3p0o+7wq(n+a#@gxx^pxdqkv3xo#g5r80-&et_a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'core',
     'users',
-    'posts'
+    'posts',
+    'notifications'
 ]
 
 MIDDLEWARE = [
@@ -82,12 +83,12 @@ WSGI_APPLICATION = 'django_server.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.mysql',
-        'ENGINE':   'mysql.connector.django',
-        'NAME': os.environ['MYSQL_DATABASE'],
-        'USER': os.environ['MYSQL_USER'],
-        'PASSWORD': os.environ['MYSQL_PASSWORD'],
-        'HOST': os.environ['MYSQL_HOST'],
+        'ENGINE': 'django.db.backends.mysql',
+        # 'ENGINE':   'mysql.connector.django',
+        'NAME': 'clase_metochat',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
         'PORT': 3306,
         'OPTIONS': {
             'auth_plugin': 'mysql_native_password'
@@ -135,6 +136,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 CORS_ORIGIN_WHITELIST = (
     'http://0.0.0.0:8080',
     'http://127.0.0.1:8080',
+    'http://localhost:8080',
     'https://metochat.jals.es'
 )
 
