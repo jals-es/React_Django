@@ -39,3 +39,19 @@ class NotifyAPIView(APIView):
         notify.delete()
 
         return Response({'message': 'Notificacion borrada'})
+
+    def get(self, request):
+
+        notify = Notification.objects.filter(id_user=request.user).order_by('-created_at')
+
+        result = []
+
+        for n in notify:
+            result.append({
+                'id': n.id,
+                'message': n.message,
+                'title': n.title,
+                'date': n.created_at
+            })
+
+        return Response(result, status=status.HTTP_201_CREATED)
