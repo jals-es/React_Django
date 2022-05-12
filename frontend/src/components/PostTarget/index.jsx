@@ -5,11 +5,12 @@ import useCreateLikeMutation from '../../hooks/useCreateLikeMutation';
 import useCreateRepeatMutation from '../../hooks/useCreateRepeatMutation';
 import useDeleteLikeMutation from '../../hooks/useDeleteLikeMutation';
 import useDeleteRepeatMutation from '../../hooks/useDeleteRepeatMutation';
+import useCreateNotify from '../../hooks/useCreateNotifyMutation';
 import { Link } from 'react-router-dom'
 import alertify from 'alertifyjs';
 import { useNavigate } from 'react-router-dom';
 import './post.css'
-import { useQueryClient } from 'react-query';
+import { useQueryClient, useQuery } from 'react-query';
 export default function PostTarget({data}){
     alertify.set('notifier', 'position', 'bottom-center');
     const [you_like, setYouLike] = useState(data.data.you_like)
@@ -35,6 +36,9 @@ export default function PostTarget({data}){
     const deleteLikeMutation = useDeleteLikeMutation()
     const createRepeatMutation = useCreateRepeatMutation()
     const deleteRepeatMutation = useDeleteRepeatMutation()
+    const createNotify = useCreateNotify()
+
+    const {data:userAuth} = useQuery("get_user_auth") 
 
     async function like(){
         if(you_like === 1){
@@ -51,6 +55,13 @@ export default function PostTarget({data}){
             setNLike(nlike + 1)
             try {
                 await createLikeMutation.mutateAsync(data.id)
+                await createNotify.mutateAsync({
+                    "notification":{
+                        "id_user": data.user.username,
+                        "message": `El usuario ${userAuth.data.first_name} ha dado like a tu post`,
+                        "title": "Nuevo Like" 
+                    }
+                })
             } catch (error) {
                 setYouLike(0)
                 setNLike(nlike - 1)
@@ -73,6 +84,13 @@ export default function PostTarget({data}){
             setNRepeat(nrepeat + 1)
             try {
                 await createRepeatMutation.mutateAsync(data.id)
+                await createNotify.mutateAsync({
+                    "notification":{
+                        "id_user": data.user.username,
+                        "message": `El usuario ${userAuth.data.first_name} ha repetido tu post`,
+                        "title": "Nuevo Repeat" 
+                    }
+                })
             } catch (error) {
                 setYouRepeat(0)
                 setNRepeat(nrepeat - 1)

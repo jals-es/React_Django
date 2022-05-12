@@ -55,12 +55,11 @@ export default function CreatePost({reply=null}){
             let createPost = await createPostMutation.mutateAsync(post)
             document.getElementById("tweet").textContent = "";
 
-            if(reply){
-                console.log(createPost.data)
-            }
+            // if(reply){
+            //     console.log(createPost.data)
+            // }
         } catch (error) {
             if(error.response.data){
-                console.log(error.response.data)
                 document.getElementById("tweet").textContent = "";
                 setError("message", {message: "Error al crear el post"})
             }

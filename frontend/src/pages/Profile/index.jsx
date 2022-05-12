@@ -7,6 +7,7 @@ import PostTarget from '../../components/PostTarget';
 import useGetUserPostsQuery from '../../hooks/useGetUserPostsQuery';
 import useFollowMutation from '../../hooks/useFollowMutation';
 import useUnfollowMutation from '../../hooks/useUnfollowMutation';
+import useCreateNotify from '../../hooks/useCreateNotifyMutation';
 import './profile.css'
 import Menu from '../../components/Menu';
 export default function Profile(){
@@ -41,10 +42,19 @@ export default function Profile(){
 
     const followMutation = useFollowMutation()
     const unfollowMutation = useUnfollowMutation()
+    const createNotify = useCreateNotify();
+
 
     async function follow(){
         try {
             await followMutation.mutateAsync(data.data.username)
+            await createNotify.mutateAsync({
+                "notification":{
+                    "id_user": data.data.username,
+                    "message": `El usuario ${userAuth.data.first_name} ha empezado a seguirte`,
+                    "title": "Nuevo Seguidor" 
+                }
+            })
         } catch (error) {
             console.log(error)
         }
