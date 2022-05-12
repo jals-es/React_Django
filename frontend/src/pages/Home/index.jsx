@@ -6,16 +6,14 @@ import { useQuery, useQueryClient } from 'react-query'
 import CreatePost from '../../components/CreatePost';
 import SuggestedUsers from '../../components/SuggestedUsers';
 import Menu from '../../components/Menu';
+import Notifications from '../../components/Notifications';
 export default function Home() {
 
 
     const {data:posts} = useGetPostsQuery();
-
-    console.log(posts);
     
     var myposts = null;
     if(posts?.data && posts.data.length > 0){
-        console.log(posts);
         myposts = posts.data.map((post)=>
             <PostTarget key={post.id+post.data.user_repeat} data={post}/>
         );
@@ -49,6 +47,7 @@ export default function Home() {
             <div className="row row2">
                 <div className="col-lg-3 col-md-6 col-sm-12 ">
                     <Menu/>
+                    <Notifications/>
                 </div>
                 <div className="col-lg-6 col-md-6 col-sm-12">
                     <div className='feedSection'>

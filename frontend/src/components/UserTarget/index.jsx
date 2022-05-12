@@ -1,7 +1,9 @@
 import './userTarget.css'
 import useFollowMutation from '../../hooks/useFollowMutation'
+import useCreateNotify from '../../hooks/useCreateNotifyMutation';
 import { httpClient as ApiHttpService } from '../../core/api.service';
 import { useNavigate } from "react-router-dom";
+import { useQuery } from 'react-query';
 export default function UserTarget({data, pfollow = true}){
 
     if(data.photo.length === 0){
@@ -9,10 +11,20 @@ export default function UserTarget({data, pfollow = true}){
     }
 
     const followMutation = useFollowMutation();
+    
+    const createNotify = useCreateNotify();
+    const {data:userAuth} = useQuery("get_user_auth") 
 
     async function follow (){
         try {
             await followMutation.mutateAsync(data.username)
+            await createNotify.mutateAsync({
+                "notification":{
+                    "id_user": data.username,
+                    "message": `El usuario ${userAuth.data.first_name} ha empezado a seguirte`,
+                    "title": "Nuevo Seguidor" 
+                }
+            })
         } catch (error) {
             if(error.response.data){
                 console.log(error.response.data)

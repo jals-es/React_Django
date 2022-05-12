@@ -13,7 +13,6 @@ export default function useCreatePost() {
                 await queryClient.cancelQueries(queryKey);
                 await queryClient.invalidateQueries('get_post')
                 await queryClient.invalidateQueries('get_all_posts')
-                console.log(response.data)
             },
             onError: async(error) => {
                 if (!error.response.data) {
